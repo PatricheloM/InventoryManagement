@@ -1,0 +1,31 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Animal",
+  "description": "An animal specie.",
+  "type": "object",
+  "properties": {
+    "name": {
+      "description": "Name of the animal.",
+      "type": "string"
+    },
+    "img": {
+      "description": "BASE64 encoded image of animal.",
+      "type": "string"
+    },
+    "type": {
+      "description": "Class of animal.",
+      "type": "string",
+      "enum": ["CHONDRICHTHYES", "OSTEICHTHYES", "AMPHIBIAN", "REPTILE", "BIRD", "MAMMAL"]
+    },
+    "extinct": {
+      "description": "Is the animal extinct?",
+      "type": "boolean"
+    },
+    "desc": {
+      "description": "Long description of animal.",
+      "type": "string"
+    }
+  },
+  "required": ["name", "img", "type", "extinct", "desc"],
+  "additionalProperties": false
+}
