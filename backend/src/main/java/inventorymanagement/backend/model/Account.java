@@ -7,6 +7,7 @@ public class Account {
     private String password;
     private AccountPrivilege privilege;
     private String companyName;
+    private String companyEmail;
 
     public String getUsername() {
         return username;
@@ -38,5 +39,13 @@ public class Account {
 
     public void setCompanyName(String companyName) {
         this.companyName = companyName;
+    }
+
+    public String getCompanyEmail() {
+        return companyEmail;
+    }
+
+    public void setCompanyEmail(String companyEmail) {
+        this.companyEmail = companyEmail;
     }
 }

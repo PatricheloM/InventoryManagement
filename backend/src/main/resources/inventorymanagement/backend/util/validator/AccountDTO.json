@@ -1,0 +1,32 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "AccountDTO",
+  "description": "An account.",
+  "type": "object",
+  "properties": {
+    "username": {
+      "description": "Username of the account.",
+      "type": "string"
+    },
+    "password": {
+      "description": "SHA-1 encrypted hash of password.",
+      "type": "string"
+    },
+    "privilege": {
+      "description": "Privilege of account.",
+      "type": "string",
+      "enum": ["ADMIN", "IMPORTER", "EXPORTER", "IMPORTER_EXPORTER", "MAINTENANCE"]
+    },
+    "companyName": {
+      "description": "Account owner's company.",
+      "type": "string"
+    },
+    "companyEmail": {
+      "description": "Email of account.",
+      "type": "string",
+      "format": "email"
+    }
+  },
+  "required": ["username", "password", "privilege", "companyName", "companyEmail"],
+  "additionalProperties": false
+}

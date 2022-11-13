@@ -13,7 +13,7 @@ public class JsonValidator {
     public static<T> boolean validate(JsonNode json, Class<T> clazz) throws SchemaNotFoundException
     {
         try {
-            JsonSchema schema = jsonSchemaFactory.getSchema(JsonValidator.class.getResourceAsStream(clazz.getName()) + ".json");
+            JsonSchema schema = jsonSchemaFactory.getSchema(JsonValidator.class.getResourceAsStream(clazz.getSimpleName() + ".json"));
             return schema.validate(json).isEmpty();
         } catch (Exception e) {
             throw new SchemaNotFoundException(e);

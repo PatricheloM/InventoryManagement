@@ -1,6 +1,7 @@
 package inventorymanagement.backend.repository.impl;
 
 import inventorymanagement.backend.model.Account;
+import inventorymanagement.backend.model.Token;
 import inventorymanagement.backend.repository.AccountRepository;
 import inventorymanagement.backend.repository.RedisRepository;
 import inventorymanagement.backend.util.InventoryManagementStringTools;
@@ -8,6 +9,8 @@ import inventorymanagement.backend.util.enums.AccountPrivilege;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -26,7 +29,8 @@ public class AccountRepositoryImpl implements AccountRepository {
             redisRepository.hmset("ACCOUNT_" + account.getUsername(), Map.of(
                     "password", account.getPassword(),
                     "privilege", account.getPrivilege().toString(),
-                    "companyName", account.getCompanyName()
+                    "companyName", account.getCompanyName(),
+                    "companyEmail", account.getCompanyEmail()
             ));
             return true;
         } else {
@@ -43,6 +47,7 @@ public class AccountRepositoryImpl implements AccountRepository {
             account.setPassword(fetch.get("password"));
             account.setPrivilege(AccountPrivilege.valueOf(fetch.get("privilege")));
             account.setCompanyName(fetch.get("companyName"));
+            account.setCompanyEmail(fetch.get("companyEmail"));
             return Optional.of(account);
         } else {
             return Optional.empty();
@@ -53,6 +58,13 @@ public class AccountRepositoryImpl implements AccountRepository {
     public List<Account> fetchAllAccounts() {
         return redisRepository.smembers(InventoryManagementStringTools.getAccountSetKey())
                 .stream().map(account -> fetchAccountByUsername(account).get()).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Account> fetchAccountsByCompany(String companyName) {
+        return redisRepository.smembers(InventoryManagementStringTools.getAccountSetKey())
+                .stream().map(account -> fetchAccountByUsername(account).get())
+                .filter(company -> company.getCompanyName().equals(companyName)).collect(Collectors.toList());
     }
 
     @Override
@@ -79,5 +91,45 @@ public class AccountRepositoryImpl implements AccountRepository {
     @Override
     public boolean accountExists(String username) {
         return redisRepository.sismember(InventoryManagementStringTools.getAccountSetKey(), username);
+    }
+
+    @Override
+    public boolean saveToken(Token token) {
+        return redisRepository.setex(token.getToken(), token.getUsername(), 86400);
+    }
+
+    @Override
+    public boolean deleteToken(String token) {
+        if (redisRepository.exists(token)) {
+            redisRepository.del(token);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public Optional<Token> getToken(String token) {
+        if (redisRepository.exists(token)) {
+            Token t = new Token();
+            t.setToken(token);
+            t.setUsername(redisRepository.get(token));
+            return Optional.of(t);
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    @Override
+    public List<Token> getTokens() {
+        List<Token> tokens = new ArrayList<>();
+        Map<String, String> map = redisRepository.keys("*-*-*-*-*");
+        for (String key : map.keySet()) {
+            Token t = new Token();
+            t.setToken(key);
+            t.setUsername(map.get(key));
+            tokens.add(t);
+        }
+        return tokens.isEmpty() ? Collections.emptyList() : tokens;
     }
 }

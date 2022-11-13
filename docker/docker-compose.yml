@@ -1,12 +1,15 @@
+---
 version: "3.3"
 services:
   redis:
-      container_name: inventorymanagement-redis
-      image: redis:alpine
-      command: ["redis-server", "/etc/redis/redis.conf"]
-      volumes:
-        - ./redis.conf:/etc/redis/redis.conf
-      expose:
-        - "6379"
-      ports:
-        - "6379:6379"
+    container_name: inventorymanagement-redis
+    image: redis:alpine
+    volumes:
+      - ./redis.conf:/etc/redis/redis.conf
+      - ./admin.redis:/root/admin.redis
+      - ./admin.sh:/root/admin.sh
+    entrypoint: sh -c "sh /root/admin.sh"
+    expose:
+      - "6379"
+    ports:
+      - "6379:6379"

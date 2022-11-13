@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "LoginDTO",
+  "description": "A login form.",
+  "type": "object",
+  "properties": {
+    "username": {
+      "description": "Username of login form.",
+      "type": "string"
+    },
+    "password": {
+      "description": "SHA-1 encrypted hash of login form's password.",
+      "type": "string"
+    }
+  },
+  "required": ["username", "password"],
+  "additionalProperties": false
+}

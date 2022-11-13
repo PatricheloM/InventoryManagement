@@ -88,4 +88,26 @@ public class RedisRepository{
     {
         return Boolean.TRUE.equals(connection.sIsMember(key.getBytes(UTF8), value.getBytes(UTF8)));
     }
+
+    public boolean setex(String key, String value, int expiration) {
+        return Boolean.TRUE.equals(connection.setEx(key.getBytes(UTF8), expiration, value.getBytes(UTF8)));
+    }
+
+    public boolean exists(String key) {
+        return Boolean.TRUE.equals(connection.exists(key.getBytes(UTF8)));
+    }
+
+    public String get(String key) {
+        Optional<byte[]> bytes = Optional.ofNullable(connection.get(key.getBytes(UTF8)));
+        return bytes.map(String::new).orElse("");
+    }
+
+    public Map<String, String> keys(String regex) {
+        Map<String, String> map = new HashMap<>();
+        for (byte[] bytes : connection.keys(regex.getBytes(UTF8))) {
+            String key = new String(bytes, UTF8);
+            map.put(key, get(key));
+        }
+        return map;
+    }
 }
