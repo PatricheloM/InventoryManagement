@@ -160,4 +160,14 @@ public class AccountController {
                     HttpStatus.UNAUTHORIZED, PATH + "/" + username);
         }
     }
+
+    @GetMapping(value = "/token")
+    public ResponseEntity<Object> checkToken(@RequestParam String token) {
+        Optional<TokenDTO> t = accountService.getToken(token);
+        if (t.isPresent()) {
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
 }
