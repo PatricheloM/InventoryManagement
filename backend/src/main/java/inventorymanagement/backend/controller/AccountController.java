@@ -161,13 +161,17 @@ public class AccountController {
         }
     }
 
-    @GetMapping(value = "/token")
-    public ResponseEntity<Object> checkToken(@RequestParam String token) {
+    @GetMapping(value = "/token/{token}", produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<Object> checkToken(@PathVariable("token") String token) {
         Optional<TokenDTO> t = accountService.getToken(token);
         if (t.isPresent()) {
-            return ResponseEntity.ok().build();
+            Optional<AccountDTO> account = accountService.fetchAccountByUsername(t.get().getUsername());
+            return account.<ResponseEntity<Object>>map(accountDTO -> new ResponseEntity<>(accountDTO, HttpStatus.OK))
+                    .orElseGet(() -> ResponseEntityFactory.produce(InventoryManagementStringTools.getUserDoesNotExistMsg(),
+                    HttpStatus.NOT_FOUND, PATH + "/token/" + token));
         } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            return ResponseEntityFactory.produce(InventoryManagementStringTools.getTokenDoesNotExistMsg(),
+                    HttpStatus.NOT_FOUND, PATH + "/token/" + token);
         }
     }
 }

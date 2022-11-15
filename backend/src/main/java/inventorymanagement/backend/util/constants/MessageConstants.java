@@ -12,4 +12,5 @@ public interface MessageConstants {
     String SUCCESSFUL_PASSWORD_CHANGE_MSG = "Successful password change";
     String USER_DOES_NOT_EXIST_MSG = "User does not exist";
     String USER_DELETED_MSG = "User deleted";
+    String TOKEN_DOES_NOT_EXIST_MSG = "Token does not exist";
 }

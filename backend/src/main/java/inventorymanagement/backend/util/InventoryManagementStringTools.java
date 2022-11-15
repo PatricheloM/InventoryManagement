@@ -40,4 +40,7 @@ public class InventoryManagementStringTools {
     public static String getUserDeletedMsg() {
         return MessageConstants.USER_DELETED_MSG;
     }
+    public static String getTokenDoesNotExistMsg() {
+        return MessageConstants.TOKEN_DOES_NOT_EXIST_MSG;
+    }
 }
