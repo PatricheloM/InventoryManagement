@@ -89,6 +89,7 @@ export default function LoginPage() {
                                     />
                                     <Input
                                         type="username"
+                                        borderRadius='xl'
                                         placeholder="Username"
                                         onChange={(e) => setUser(e.target.value)} />
                                 </InputGroup>
@@ -97,23 +98,23 @@ export default function LoginPage() {
                                 <InputGroup>
                                     <InputLeftElement
                                         pointerEvents="none"
-                                        color="gray.300"
                                     />
                                     <Input
                                         id="pass"
+                                        borderRadius='xl'
                                         type={showPassword ? "text" : "password"}
                                         placeholder="Password"
                                         onChange={(e) => setPass(e.target.value)}
                                     />
                                     <InputRightElement width="4.5rem">
-                                        <Button h="1.75rem" size="sm" onClick={handleShowClick}>
+                                        <Button h="1.75rem" size="sm" onClick={handleShowClick} borderRadius='xl'>
                                             {showPassword ? "Hide" : "Show"}
                                         </Button>
                                     </InputRightElement>
                                 </InputGroup>
                             </FormControl>
                             <Button
-                                borderRadius={0}
+                                borderRadius='xl'
                                 type="submit"
                                 variant="solid"
                                 colorScheme="teal"

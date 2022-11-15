@@ -53,7 +53,7 @@ public class AccountController {
         try {
             if (JsonValidator.validate(JsonFactory.produce(object), LoginDTO.class)) {
                 LoginDTO login = modelMapper.map(object, LoginDTO.class);
-                Optional<AccountDTO> account = accountService.fetchAccountByUsername(login.getUsername());
+                Optional<AccountDTO> account = accountService.fetchAccountByUsername(login.getUsername().toLowerCase());
                 if (account.isPresent() && account.get().getPassword().equals(login.getPassword())) {
                     String token = TokenFactory.generate();
                     TokenDTO t = new TokenDTO(token, account.get().getUsername());

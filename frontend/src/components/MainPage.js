@@ -1,5 +1,11 @@
+import Header from '../layout/Header';
+
 export default function MainPage() {
     return (
-        <>Logged in</>
+        <>
+            <Header>
+                Logged in
+            </Header>
+        </>
     );
 }
