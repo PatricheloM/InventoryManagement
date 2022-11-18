@@ -47,7 +47,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public List<AccountDTO> fetchAccountsByCompany(String companyName) {
-        return accountRepository.fetchAllAccounts().stream()
+        return accountRepository.fetchAccountsByCompany(companyName).stream()
                 .map(account -> modelMapper.map(account, AccountDTO.class)).collect(Collectors.toList());
     }
 

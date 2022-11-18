@@ -110,4 +110,8 @@ public class RedisRepository{
         }
         return map;
     }
+
+    public int incrBy(String key, int value) {
+        return connection.incrBy(key.getBytes(UTF8), value).intValue();
+    }
 }

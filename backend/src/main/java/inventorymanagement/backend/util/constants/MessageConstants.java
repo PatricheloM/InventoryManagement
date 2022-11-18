@@ -13,4 +13,6 @@ public interface MessageConstants {
     String USER_DOES_NOT_EXIST_MSG = "User does not exist";
     String USER_DELETED_MSG = "User deleted";
     String TOKEN_DOES_NOT_EXIST_MSG = "Token does not exist";
+    String ITEM_ADDED_MSG = "Item added";
+    String ITEM_NOT_FOUND_MSG = "Item not found";
 }

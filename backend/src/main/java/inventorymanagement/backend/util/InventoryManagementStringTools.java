@@ -7,6 +7,12 @@ public class InventoryManagementStringTools {
     public static String getAccountSetKey() {
         return RedisConstants.ACCOUNT_NAMES_KEY;
     }
+    public static String getItemSetKey() {
+        return RedisConstants.ITEM_NAMES_KEY;
+    }
+    public static String getItemIdKey() {
+        return RedisConstants.ITEM_ID_KEY;
+    }
     public static String getBadRequestMsg() {
         return MessageConstants.BAD_REQUEST_MSG;
     }
@@ -42,5 +48,11 @@ public class InventoryManagementStringTools {
     }
     public static String getTokenDoesNotExistMsg() {
         return MessageConstants.TOKEN_DOES_NOT_EXIST_MSG;
+    }
+    public static String getItemAddedMsg() {
+        return MessageConstants.ITEM_ADDED_MSG;
+    }
+    public static String getItemNotFoundMsg() {
+        return MessageConstants.ITEM_NOT_FOUND_MSG;
     }
 }

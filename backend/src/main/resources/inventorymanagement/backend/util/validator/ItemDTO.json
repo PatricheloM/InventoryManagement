@@ -1,0 +1,32 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "ItemDTO",
+  "description": "An item.",
+  "type": "object",
+  "properties": {
+    "name": {
+      "description": "Name of the item.",
+      "type": "string"
+    },
+    "weight": {
+      "description": "Weight of item. (kg)",
+      "type": "number"
+    },
+    "company": {
+      "description": "Manufacturer company.",
+      "type": "string"
+    },
+    "arrival": {
+      "description": "Arrival date and time.",
+      "type": "string",
+      "format": "date-time"
+    },
+    "location": {
+      "description": "Location of the item.",
+      "type": "string",
+      "pattern": "^[A-Z]-[0-9]{4}$"
+    }
+  },
+  "required": ["name", "weight", "company", "arrival", "location"],
+  "additionalProperties": false
+}

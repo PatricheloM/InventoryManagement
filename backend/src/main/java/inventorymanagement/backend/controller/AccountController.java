@@ -107,8 +107,7 @@ public class AccountController {
                 else
                     return ResponseEntityFactory.produce(InventoryManagementStringTools.getBadRequestMsg(),
                             HttpStatus.BAD_REQUEST, PATH + "/register");
-            }
-            catch (SchemaNotFoundException | JsonProcessingException e) {
+            } catch (SchemaNotFoundException | JsonProcessingException e) {
                 return ResponseEntityFactory.produce(InventoryManagementStringTools.getInternalServerErrorMsg(),
                         HttpStatus.INTERNAL_SERVER_ERROR, PATH + "/register");
             }
