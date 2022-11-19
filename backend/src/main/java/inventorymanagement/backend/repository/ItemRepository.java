@@ -17,4 +17,5 @@ public interface ItemRepository {
     List<Item> fetchItemByCompany(String company);
     List<Item> fetchItemByLocation(String location);
     List<Item> fetchItemByArrival(Date start, Date end);
+    List<Item> fetchAllItems();
 }

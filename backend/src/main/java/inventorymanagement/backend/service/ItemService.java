@@ -17,4 +17,5 @@ public interface ItemService {
     List<ItemDTO> fetchItemByCompany(String company);
     List<ItemDTO> fetchItemByLocation(String location);
     List<ItemDTO> fetchItemByArrival(Date start, Date end);
+    List<ItemDTO> fetchAllItems();
 }

@@ -114,4 +114,10 @@ public class ItemRepositoryImpl implements ItemRepository {
                 .stream().map(id -> fetchItem(Integer.parseInt(id)).get())
                 .filter(date -> date.getArrival().before(end) && date.getArrival().after(start)).collect(Collectors.toList());
     }
+
+    @Override
+    public List<Item> fetchAllItems() {
+        return redisRepository.smembers(InventoryManagementStringTools.getItemSetKey())
+                .stream().map(id -> fetchItem(Integer.parseInt(id)).get()).collect(Collectors.toList());
+    }
 }

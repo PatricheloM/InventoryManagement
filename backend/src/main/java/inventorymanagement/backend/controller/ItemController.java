@@ -115,6 +115,20 @@ public class ItemController {
     @Authorization(privileges = { AccountPrivilege.ADMIN,
             AccountPrivilege.EXPORTER, AccountPrivilege.IMPORTER,
             AccountPrivilege.IMPORTER_EXPORTER, AccountPrivilege.MAINTENANCE})
+    @GetMapping(value = "/item", produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<Object> getAllItems(@RequestParam String token) {
+        if (authorizationCheck.check(new Object(){}.getClass().getEnclosingMethod(), token)) {
+            List<ItemDTO> items = itemService.fetchAllItems();
+            return new ResponseEntity<>(items, HttpStatus.OK);
+        } else {
+            return ResponseEntityFactory.produce(InventoryManagementStringTools.getUnauthorizedMsg(),
+                    HttpStatus.UNAUTHORIZED, PATH + "/item");
+        }
+    }
+
+    @Authorization(privileges = { AccountPrivilege.ADMIN,
+            AccountPrivilege.EXPORTER, AccountPrivilege.IMPORTER,
+            AccountPrivilege.IMPORTER_EXPORTER, AccountPrivilege.MAINTENANCE})
     @GetMapping(value = "/name/{name}", produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> getItemByName(@PathVariable("name") String name, @RequestParam String token) {
         if (authorizationCheck.check(new Object(){}.getClass().getEnclosingMethod(), token)) {

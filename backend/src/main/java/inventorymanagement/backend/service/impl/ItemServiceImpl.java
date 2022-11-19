@@ -81,4 +81,10 @@ public class ItemServiceImpl implements ItemService {
         return itemRepository.fetchItemByArrival(start, end).stream()
                 .map(item -> modelMapper.map(item, ItemDTO.class)).collect(Collectors.toList());
     }
+
+    @Override
+    public List<ItemDTO> fetchAllItems() {
+        return itemRepository.fetchAllItems().stream()
+                .map(item -> modelMapper.map(item, ItemDTO.class)).collect(Collectors.toList());
+    }
 }
