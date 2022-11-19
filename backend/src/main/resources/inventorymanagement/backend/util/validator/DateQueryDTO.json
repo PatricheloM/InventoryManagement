@@ -1,0 +1,20 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "DateQueryDTO",
+  "description": "A date query.",
+  "type": "object",
+  "properties": {
+    "start": {
+      "description": "Start of the query.",
+      "type": "string",
+      "format": "date-time"
+    },
+    "end": {
+      "description": "End of the query.",
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": ["start", "end"],
+  "additionalProperties": false
+}

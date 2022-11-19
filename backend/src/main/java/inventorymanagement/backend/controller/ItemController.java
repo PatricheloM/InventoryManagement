@@ -1,13 +1,13 @@
 package inventorymanagement.backend.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import inventorymanagement.backend.dto.DateQueryDTO;
 import inventorymanagement.backend.dto.ItemDTO;
 import inventorymanagement.backend.service.ItemService;
 import inventorymanagement.backend.util.InventoryManagementStringTools;
 import inventorymanagement.backend.util.ResponseEntityFactory;
 import inventorymanagement.backend.util.auth.Authorization;
 import inventorymanagement.backend.util.auth.AuthorizationCheck;
-import inventorymanagement.backend.util.date.DateConverter;
 import inventorymanagement.backend.util.enums.AccountPrivilege;
 import inventorymanagement.backend.util.exception.SchemaNotFoundException;
 import inventorymanagement.backend.util.json.JsonFactory;
@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Optional;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -69,19 +70,112 @@ public class ItemController {
         }
     }
 
+    @Authorization(privileges = { AccountPrivilege.ADMIN, AccountPrivilege.EXPORTER})
+    @PostMapping(value = "/exporting", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<Object> exporting(@RequestBody Object object, @RequestParam String token) {
+        if (authorizationCheck.check(new Object(){}.getClass().getEnclosingMethod(), token)) {
+            try {
+                if (JsonValidator.validate(JsonFactory.produce(object), ItemDTO.class)) {
+                    ItemDTO item = modelMapper.map(object, ItemDTO.class);
+                    if (itemService.deleteItem(itemService.getItemId(item))) {
+                        return ResponseEntityFactory.produce(InventoryManagementStringTools.getItemDeletedMsg(),
+                                HttpStatus.OK, PATH + "/exporting");
+                    } else {
+                        return ResponseEntityFactory.produce(InventoryManagementStringTools.getItemNotFoundMsg(),
+                                HttpStatus.NOT_FOUND, PATH + "/exporting");
+                    }
+                } else
+                    return ResponseEntityFactory.produce(InventoryManagementStringTools.getBadRequestMsg(),
+                            HttpStatus.BAD_REQUEST, PATH + "/exporting");
+            } catch (SchemaNotFoundException | JsonProcessingException e) {
+                return ResponseEntityFactory.produce(InventoryManagementStringTools.getInternalServerErrorMsg(),
+                        HttpStatus.INTERNAL_SERVER_ERROR, PATH + "/exporting");
+            }
+        } else {
+            return ResponseEntityFactory.produce(InventoryManagementStringTools.getUnauthorizedMsg(),
+                    HttpStatus.UNAUTHORIZED, PATH + "/exporting");
+        }
+    }
+
     @Authorization(privileges = { AccountPrivilege.ADMIN,
             AccountPrivilege.EXPORTER, AccountPrivilege.IMPORTER,
             AccountPrivilege.IMPORTER_EXPORTER, AccountPrivilege.MAINTENANCE})
-    @GetMapping(value = "/{itemId}", produces = APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/item/{itemId}", produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> getItem(@PathVariable("itemId") int itemId, @RequestParam String token) {
         if (authorizationCheck.check(new Object(){}.getClass().getEnclosingMethod(), token)) {
             Optional<ItemDTO> item = itemService.fetchItem(itemId);
             return item.<ResponseEntity<Object>>map(itemDTO -> new ResponseEntity<>(itemDTO, HttpStatus.OK))
                     .orElseGet(() -> ResponseEntityFactory.produce(InventoryManagementStringTools.getItemNotFoundMsg(),
-                    HttpStatus.NOT_FOUND, PATH + "/" + itemId));
+                    HttpStatus.NOT_FOUND, PATH + "/item/" + itemId));
         } else {
             return ResponseEntityFactory.produce(InventoryManagementStringTools.getUnauthorizedMsg(),
-                    HttpStatus.UNAUTHORIZED, PATH + "/" + itemId);
+                    HttpStatus.UNAUTHORIZED, PATH + "/item/" + itemId);
+        }
+    }
+
+    @Authorization(privileges = { AccountPrivilege.ADMIN,
+            AccountPrivilege.EXPORTER, AccountPrivilege.IMPORTER,
+            AccountPrivilege.IMPORTER_EXPORTER, AccountPrivilege.MAINTENANCE})
+    @GetMapping(value = "/name/{name}", produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<Object> getItemByName(@PathVariable("name") String name, @RequestParam String token) {
+        if (authorizationCheck.check(new Object(){}.getClass().getEnclosingMethod(), token)) {
+            List<ItemDTO> items = itemService.fetchItemByName(name);
+            return new ResponseEntity<>(items, HttpStatus.OK);
+        } else {
+            return ResponseEntityFactory.produce(InventoryManagementStringTools.getUnauthorizedMsg(),
+                    HttpStatus.UNAUTHORIZED, PATH + "/name/" + name);
+        }
+    }
+
+    @Authorization(privileges = { AccountPrivilege.ADMIN,
+            AccountPrivilege.EXPORTER, AccountPrivilege.IMPORTER,
+            AccountPrivilege.IMPORTER_EXPORTER, AccountPrivilege.MAINTENANCE})
+    @GetMapping(value = "/company/{company}", produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<Object> getItemByCompany(@PathVariable("company") String company, @RequestParam String token) {
+        if (authorizationCheck.check(new Object(){}.getClass().getEnclosingMethod(), token)) {
+            List<ItemDTO> items = itemService.fetchItemByCompany(company);
+            return new ResponseEntity<>(items, HttpStatus.OK);
+        } else {
+            return ResponseEntityFactory.produce(InventoryManagementStringTools.getUnauthorizedMsg(),
+                    HttpStatus.UNAUTHORIZED, PATH + "/company/" + company);
+        }
+    }
+
+    @Authorization(privileges = { AccountPrivilege.ADMIN,
+            AccountPrivilege.EXPORTER, AccountPrivilege.IMPORTER,
+            AccountPrivilege.IMPORTER_EXPORTER, AccountPrivilege.MAINTENANCE})
+    @GetMapping(value = "/location/{location}", produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<Object> getItemByLocation(@PathVariable("location") String location, @RequestParam String token) {
+        if (authorizationCheck.check(new Object(){}.getClass().getEnclosingMethod(), token)) {
+            List<ItemDTO> items = itemService.fetchItemByLocation(location);
+            return new ResponseEntity<>(items, HttpStatus.OK);
+        } else {
+            return ResponseEntityFactory.produce(InventoryManagementStringTools.getUnauthorizedMsg(),
+                    HttpStatus.UNAUTHORIZED, PATH + "/company/" + location);
+        }
+    }
+
+    @Authorization(privileges = { AccountPrivilege.ADMIN,
+            AccountPrivilege.EXPORTER, AccountPrivilege.IMPORTER,
+            AccountPrivilege.IMPORTER_EXPORTER, AccountPrivilege.MAINTENANCE})
+    @PostMapping(value = "/date", produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<Object> getItemByDate(@RequestBody Object object, @RequestParam String token) {
+        if (authorizationCheck.check(new Object(){}.getClass().getEnclosingMethod(), token)) {
+            try {
+                if (JsonValidator.validate(JsonFactory.produce(object), DateQueryDTO.class)) {
+                    DateQueryDTO dateQuery = modelMapper.map(object, DateQueryDTO.class);
+                    List<ItemDTO> items = itemService.fetchItemByArrival(dateQuery.getStart(), dateQuery.getEnd());
+                    return new ResponseEntity<>(items, HttpStatus.OK);
+                } else
+                    return ResponseEntityFactory.produce(InventoryManagementStringTools.getBadRequestMsg(),
+                            HttpStatus.BAD_REQUEST, PATH + "/date");
+            } catch (SchemaNotFoundException | JsonProcessingException e) {
+                return ResponseEntityFactory.produce(InventoryManagementStringTools.getInternalServerErrorMsg(),
+                        HttpStatus.INTERNAL_SERVER_ERROR, PATH + "/date");
+            }
+        } else {
+            return ResponseEntityFactory.produce(InventoryManagementStringTools.getUnauthorizedMsg(),
+                    HttpStatus.UNAUTHORIZED, PATH + "/date");
         }
     }
 }

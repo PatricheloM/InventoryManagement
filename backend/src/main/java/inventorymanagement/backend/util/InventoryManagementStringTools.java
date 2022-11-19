@@ -55,4 +55,7 @@ public class InventoryManagementStringTools {
     public static String getItemNotFoundMsg() {
         return MessageConstants.ITEM_NOT_FOUND_MSG;
     }
+    public static String getItemDeletedMsg() {
+        return MessageConstants.ITEM_DELETED_MSG;
+    }
 }
