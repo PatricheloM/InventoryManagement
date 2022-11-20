@@ -1,4 +1,3 @@
-import React from "react";
 import MainPage from "./components/MainPage";
 import LoginPage from "./components/LoginPage";
 import {
@@ -33,7 +32,7 @@ function CheckAuth({ children }) {
 
   const user = check(token);
 
-  if (!user) {
+  if (!user) { // TODO: bug when token expires
     return (<Navigate to="/login" replace={true} />);
   }
 
