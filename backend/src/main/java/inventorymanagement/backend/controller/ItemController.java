@@ -3,14 +3,18 @@ package inventorymanagement.backend.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import inventorymanagement.backend.dto.DateQueryDTO;
 import inventorymanagement.backend.dto.ItemDTO;
+import inventorymanagement.backend.dto.PdfDTO;
 import inventorymanagement.backend.service.ItemService;
 import inventorymanagement.backend.util.InventoryManagementStringTools;
 import inventorymanagement.backend.util.ResponseEntityFactory;
 import inventorymanagement.backend.util.auth.Authorization;
 import inventorymanagement.backend.util.auth.AuthorizationCheck;
 import inventorymanagement.backend.util.enums.AccountPrivilege;
+import inventorymanagement.backend.util.enums.ImportExport;
 import inventorymanagement.backend.util.exception.SchemaNotFoundException;
 import inventorymanagement.backend.util.json.JsonFactory;
+import inventorymanagement.backend.util.pdf.Base64Encoder;
+import inventorymanagement.backend.util.pdf.PdfFactory;
 import inventorymanagement.backend.util.validator.JsonValidator;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,8 +58,9 @@ public class ItemController {
                 if (JsonValidator.validate(JsonFactory.produce(object), ItemDTO.class)) {
                     ItemDTO item = modelMapper.map(object, ItemDTO.class);
                     itemService.saveItem(item);
-                    return ResponseEntityFactory.produce(InventoryManagementStringTools.getItemAddedMsg(),
-                            HttpStatus.OK, PATH + "/importing");
+                    PdfDTO pdf = new PdfDTO();
+                    pdf.setPdf(Base64Encoder.encode(PdfFactory.produce(item, ImportExport.IMPORT)));
+                    return new ResponseEntity<>(pdf, HttpStatus.OK);
                 } else
                     return ResponseEntityFactory.produce(InventoryManagementStringTools.getBadRequestMsg(),
                             HttpStatus.BAD_REQUEST, PATH + "/importing");
@@ -77,8 +82,9 @@ public class ItemController {
                 if (JsonValidator.validate(JsonFactory.produce(object), ItemDTO.class)) {
                     ItemDTO item = modelMapper.map(object, ItemDTO.class);
                     if (itemService.deleteItem(itemService.getItemId(item))) {
-                        return ResponseEntityFactory.produce(InventoryManagementStringTools.getItemDeletedMsg(),
-                                HttpStatus.OK, PATH + "/exporting");
+                        PdfDTO pdf = new PdfDTO();
+                        pdf.setPdf(Base64Encoder.encode(PdfFactory.produce(item, ImportExport.EXPORT)));
+                        return new ResponseEntity<>(pdf, HttpStatus.OK);
                     } else {
                         return ResponseEntityFactory.produce(InventoryManagementStringTools.getItemNotFoundMsg(),
                                 HttpStatus.NOT_FOUND, PATH + "/exporting");

@@ -3,10 +3,12 @@ import Header from "../layout/Header";
 import { ArrowDownIcon } from '@chakra-ui/icons'
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 export default function ImportPage() {
 
     const toast = useToast();
+    const navigate = useNavigate();
     const token = localStorage.getItem('IMTOKEN');
     const [ownUser, setOwnUser] = useState();
 
@@ -34,11 +36,17 @@ export default function ImportPage() {
         })
             .then(function (response) {
                 toast({
-                    title: 'Exporting successful!',
+                    title: 'Importing successful!',
                     status: 'success',
-                    duration: 3000,
+                    duration: 10000,
                     isClosable: true,
                 })
+                let pdfWindow = window.open("")
+                pdfWindow.document.write(
+                    "<object width='100%' height='100%' data='data:application/pdf;base64, " +
+                    response.data.pdf + "'></object>"
+                )
+                navigate('/main');
             })
             .catch(function (error) {
                 if (error.response.data.status === 401) {
@@ -71,7 +79,7 @@ export default function ImportPage() {
     return (
         <>
             <Header>
-                <Container p={4} backgroundColor="whiteAlpha.900" boxShadow="md" minW="75vh"  centerContent>
+                <Container p={4} backgroundColor="whiteAlpha.900" boxShadow="md" minW="75vh" centerContent>
                     <ArrowDownIcon color="teal.500" w={16} h={16} />
                     <Heading color="teal.400">Importing</Heading>
                     <Box marginTop="2vh" padding='4' bg="gray.100" color='black' minW="70vh">
