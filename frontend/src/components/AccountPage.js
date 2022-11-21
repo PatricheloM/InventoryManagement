@@ -6,7 +6,7 @@ import Header from '../layout/Header';
 
 
 export default function AccountPage() {
-
+    const { isOpen: isOpenU, onOpen: onOpenU, onClose: onCloseU } = useDisclosure()
     const { isOpen: isOpenReg, onOpen: onOpenReg, onClose: onCloseReg } = useDisclosure()
     const { isOpen: isOpenPw, onOpen: onOpenPw, onClose: onClosePw } = useDisclosure()
     const [showPassword, setShowPassword] = useState(false);
@@ -130,8 +130,75 @@ export default function AccountPage() {
             });
     }
 
+    async function getSearchUserDate(e) {
+        e.preventDefault();
+        axios.get("http://localhost:8080/api/account/" + user + '?token=' + token)
+        .then(function (response) {
+            document.getElementById('searchedU').innerText = "Username: " + response.data.username;
+            document.getElementById('searchedPrivilege').innerText = "Privilege: " + response.data.privilege;
+            document.getElementById('searchedComp').innerText = "Company: " + response.data.companyName;
+            document.getElementById('searchedEmail').innerText = "Company Email: " + response.data.companyEmail;
+        })
+        .catch(function (error) {
+            if (error.response.data.status === 401) {
+                toast({
+                    title: 'You can\'t search for users!',
+                    status: 'error',
+                    duration: 3000,
+                    isClosable: true,
+                })
+            }
+            if (error.response.data.status === 404) {
+                toast({
+                    title: 'User not found!',
+                    status: 'error',
+                    duration: 3000,
+                    isClosable: true,
+                })
+            }
+            if (error.response.data.status === 500) {
+                toast({
+                    title: 'Internal server error!',
+                    status: 'error',
+                    duration: 3000,
+                    isClosable: true,
+                })
+            }
+        });
+    }
+
     return (
         <>
+
+            <Modal
+                isOpen={isOpenU}
+                onClose={onCloseU}
+            >
+                <ModalOverlay />
+                <ModalContent>
+                    <ModalHeader>Search for user</ModalHeader>
+                    <ModalCloseButton />
+                    <ModalBody pb={6}>
+                        <FormControl mb="4">
+                            <FormLabel>Username</FormLabel>
+                            <Input placeholder='Username' onChange={(e) => setUser(e.target.value)} />
+                        </FormControl>
+                        <Box id="searchedU"></Box>
+                        <Box id="searchedPrivilege"></Box>
+                        <Box id="searchedComp"></Box>
+                        <Box id="searchedEmail"></Box>
+                    </ModalBody>
+
+                    <ModalFooter>
+                        <Button onClick={(e) => getSearchUserDate(e)}
+                                variant="solid"
+                                colorScheme="teal" mr={3}>
+                            Search
+                        </Button>
+                        <Button onClick={onCloseU}>Cancel</Button>
+                    </ModalFooter>
+                </ModalContent>
+            </Modal>
 
             <Modal
                 isOpen={isOpenPw}
@@ -139,7 +206,7 @@ export default function AccountPage() {
             >
                 <ModalOverlay />
                 <ModalContent>
-                    <ModalHeader>Create your account</ModalHeader>
+                    <ModalHeader>Change password</ModalHeader>
                     <ModalCloseButton />
                     <ModalBody pb={6}>
                         <FormControl>
@@ -172,7 +239,9 @@ export default function AccountPage() {
                     </ModalBody>
 
                     <ModalFooter>
-                        <Button onClick={(e) => getPaswordChangeData(e)} bg='teal.500' color='white' mr={3}>
+                        <Button onClick={(e) => getPaswordChangeData(e)}
+                            variant="solid"
+                            colorScheme="teal" mr={3}>
                             Change
                         </Button>
                         <Button onClick={onClosePw}>Cancel</Button>
@@ -235,7 +304,9 @@ export default function AccountPage() {
                     </ModalBody>
 
                     <ModalFooter>
-                        <Button onClick={(e) => getRegistrationData(e)} bg='teal.500' color='white' mr={3}>
+                        <Button onClick={(e) => getRegistrationData(e)}
+                            variant="solid"
+                            colorScheme="teal" mr={3}>
                             Register
                         </Button>
                         <Button onClick={onCloseReg}>Cancel</Button>
@@ -248,10 +319,11 @@ export default function AccountPage() {
                     <Avatar bg="teal.500" />
                     <Heading color="teal.400">Account</Heading>
                     <Box marginTop="2vh" padding='4' bg="gray.100" color='black' maxW='md'>
-                        <Grid templateColumns='repeat(1, 3fr)' gap={6} >
+                        <Grid templateColumns='repeat(1, 4fr)' gap={6} >
+                            <GridItem><Center><Box as='button' onClick={onOpenU} minWidth="40vh" borderRadius='md' bg='teal.500' color='white' px={4} h={8}>Search for user</Box></Center></GridItem>
                             <GridItem><Center><Box as='button' onClick={onOpenReg} minWidth="40vh" borderRadius='md' bg='teal.300' color='white' px={4} h={8}>Create new</Box></Center></GridItem>
                             <GridItem><Center><Box as='button' onClick={onOpenPw} minWidth="40vh" borderRadius='md' bg='teal.300' color='white' px={4} h={8}>Change password</Box></Center></GridItem>
-                            <GridItem><Center><Box as='button' minWidth="40vh" borderRadius='md' bg='teal.300' color='white' px={4} h={8}>Delete user</Box></Center></GridItem>
+                            <GridItem><Center><Box as='button' minWidth="40vh" borderRadius='md' bg='tomato' color='white' px={4} h={8}>Delete user</Box></Center></GridItem>
                         </Grid>
                     </Box>
                 </Container>

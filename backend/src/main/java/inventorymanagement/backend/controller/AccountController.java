@@ -173,4 +173,19 @@ public class AccountController {
                     HttpStatus.NOT_FOUND, PATH + "/token/" + token);
         }
     }
+
+    @Authorization(privileges = { AccountPrivilege.ADMIN, AccountPrivilege.MAINTENANCE })
+    @GetMapping(value = "/{username}", produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<Object> getUser(@PathVariable("username") String username, @RequestParam String token) {
+        if (authorizationCheck.check(new Object(){}.getClass().getEnclosingMethod(), token) ) {
+            Optional<AccountDTO> account = accountService.fetchAccountByUsername(username);
+            return account.<ResponseEntity<Object>>map(accountDTO -> new ResponseEntity<>(accountDTO, HttpStatus.OK))
+                    .orElseGet(() -> ResponseEntityFactory.produce(InventoryManagementStringTools.getUserDoesNotExistMsg(),
+                            HttpStatus.NOT_FOUND, PATH + "/" + username));
+
+        } else {
+            return ResponseEntityFactory.produce(InventoryManagementStringTools.getUnauthorizedMsg(),
+                    HttpStatus.UNAUTHORIZED, PATH + "/" + username);
+        }
+    }
 }
