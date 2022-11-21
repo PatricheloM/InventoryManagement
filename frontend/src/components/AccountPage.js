@@ -9,6 +9,7 @@ export default function AccountPage() {
     const { isOpen: isOpenU, onOpen: onOpenU, onClose: onCloseU } = useDisclosure()
     const { isOpen: isOpenReg, onOpen: onOpenReg, onClose: onCloseReg } = useDisclosure()
     const { isOpen: isOpenPw, onOpen: onOpenPw, onClose: onClosePw } = useDisclosure()
+    const { isOpen: isOpenD, onOpen: onOpenD, onClose: onCloseD } = useDisclosure()
     const [showPassword, setShowPassword] = useState(false);
     const handleShowClick = () => setShowPassword(!showPassword);
     const sha1 = require('sha-1');
@@ -50,6 +51,10 @@ export default function AccountPage() {
                     duration: 3000,
                     isClosable: true,
                 })
+                setUser("");
+                setPass("");
+                setCompany("");
+                setEmail("");
                 onCloseReg();
             })
             .catch(function (error) {
@@ -99,6 +104,8 @@ export default function AccountPage() {
                     duration: 3000,
                     isClosable: true,
                 })
+                setUser("");
+                setPass("");
                 onClosePw();
             })
             .catch(function (error) {
@@ -130,7 +137,7 @@ export default function AccountPage() {
             });
     }
 
-    async function getSearchUserDate(e) {
+    async function getSearchUserData(e) {
         e.preventDefault();
         axios.get("http://localhost:8080/api/account/" + user + '?token=' + token)
         .then(function (response) {
@@ -138,11 +145,54 @@ export default function AccountPage() {
             document.getElementById('searchedPrivilege').innerText = "Privilege: " + response.data.privilege;
             document.getElementById('searchedComp').innerText = "Company: " + response.data.companyName;
             document.getElementById('searchedEmail').innerText = "Company Email: " + response.data.companyEmail;
+            document.getElementById("searchUser").value = "";
+            setUser("");
         })
         .catch(function (error) {
             if (error.response.data.status === 401) {
                 toast({
                     title: 'You can\'t search for users!',
+                    status: 'error',
+                    duration: 3000,
+                    isClosable: true,
+                })
+            }
+            if (error.response.data.status === 404) {
+                toast({
+                    title: 'User not found!',
+                    status: 'error',
+                    duration: 3000,
+                    isClosable: true,
+                })
+            }
+            if (error.response.data.status === 500) {
+                toast({
+                    title: 'Internal server error!',
+                    status: 'error',
+                    duration: 3000,
+                    isClosable: true,
+                })
+            }
+        });
+    }
+
+    async function getDeleteUserData(e) {
+        e.preventDefault();
+        axios.delete("http://localhost:8080/api/account/" + user + '?token=' + token)
+        .then(function (response) {
+            toast({
+                title: 'User deleted!',
+                status: 'success',
+                duration: 3000,
+                isClosable: true,
+            })
+            setUser("");
+            onCloseD();
+        })
+        .catch(function (error) {
+            if (error.response.data.status === 401) {
+                toast({
+                    title: 'You can\'t delete users!',
                     status: 'error',
                     duration: 3000,
                     isClosable: true,
@@ -181,7 +231,7 @@ export default function AccountPage() {
                     <ModalBody pb={6}>
                         <FormControl mb="4">
                             <FormLabel>Username</FormLabel>
-                            <Input placeholder='Username' onChange={(e) => setUser(e.target.value)} />
+                            <Input placeholder='Username' id="searchUser" onChange={(e) => setUser(e.target.value)} />
                         </FormControl>
                         <Box id="searchedU"></Box>
                         <Box id="searchedPrivilege"></Box>
@@ -190,7 +240,7 @@ export default function AccountPage() {
                     </ModalBody>
 
                     <ModalFooter>
-                        <Button onClick={(e) => getSearchUserDate(e)}
+                        <Button onClick={(e) => getSearchUserData(e)}
                                 variant="solid"
                                 colorScheme="teal" mr={3}>
                             Search
@@ -314,6 +364,32 @@ export default function AccountPage() {
                 </ModalContent>
             </Modal>
 
+            <Modal
+                isOpen={isOpenD}
+                onClose={onCloseD}
+            >
+                <ModalOverlay />
+                <ModalContent>
+                    <ModalHeader>Delete user</ModalHeader>
+                    <ModalCloseButton />
+                    <ModalBody pb={6}>
+                        <FormControl>
+                            <FormLabel>Username</FormLabel>
+                            <Input placeholder='Username' onChange={(e) => setUser(e.target.value)} />
+                        </FormControl>
+                    </ModalBody>
+
+                    <ModalFooter>
+                        <Button onClick={(e) => getDeleteUserData(e)}
+                                variant="solid"
+                                colorScheme="red" mr={3}>
+                            Delete user
+                        </Button>
+                        <Button onClick={onCloseD}>Cancel</Button>
+                    </ModalFooter>
+                </ModalContent>
+            </Modal>
+
             <Header>
                 <Container p={4} backgroundColor="whiteAlpha.900" boxShadow="md" centerContent>
                     <Avatar bg="teal.500" />
@@ -323,7 +399,7 @@ export default function AccountPage() {
                             <GridItem><Center><Box as='button' onClick={onOpenU} minWidth="40vh" borderRadius='md' bg='teal.500' color='white' px={4} h={8}>Search for user</Box></Center></GridItem>
                             <GridItem><Center><Box as='button' onClick={onOpenReg} minWidth="40vh" borderRadius='md' bg='teal.300' color='white' px={4} h={8}>Create new</Box></Center></GridItem>
                             <GridItem><Center><Box as='button' onClick={onOpenPw} minWidth="40vh" borderRadius='md' bg='teal.300' color='white' px={4} h={8}>Change password</Box></Center></GridItem>
-                            <GridItem><Center><Box as='button' minWidth="40vh" borderRadius='md' bg='tomato' color='white' px={4} h={8}>Delete user</Box></Center></GridItem>
+                            <GridItem><Center><Box as='button' onClick={onOpenD} minWidth="40vh" borderRadius='md' bg='tomato' color='white' px={4} h={8}>Delete user</Box></Center></GridItem>
                         </Grid>
                     </Box>
                 </Container>
