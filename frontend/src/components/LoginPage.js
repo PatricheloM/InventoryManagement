@@ -13,9 +13,8 @@ import {
     InputRightElement,
     useToast
 } from "@chakra-ui/react";
-import { useState } from "react";
-import check from "../util/CheckToken";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 
 export default function LoginPage() {
@@ -28,13 +27,17 @@ export default function LoginPage() {
     const navigate = useNavigate();
 
     const token = localStorage.getItem("IMTOKEN");
-    if (token) {
-        const user = check(token);
-
-        if (user) {
-            return (<Navigate to="/main" replace={true} />);
-        }
-    }
+    useEffect(() => {
+      async function check() {
+        await axios.get("http://localhost:8080/api/account/token/" + token)
+        .then(function (response) {
+            navigate('/main');
+        })
+      }
+      if (token) {
+        check();
+      }
+    });
 
     async function getStoreData(e) {
         e.preventDefault();
@@ -50,6 +53,14 @@ export default function LoginPage() {
                 if (error.response.data.status === 403) {
                     toast({
                         title: 'Wrong credentials!',
+                        status: 'error',
+                        duration: 3000,
+                        isClosable: true,
+                    })
+                }
+                if (error.response.data.status === 500) {
+                    toast({
+                        title: 'Internal server error!',
                         status: 'error',
                         duration: 3000,
                         isClosable: true,

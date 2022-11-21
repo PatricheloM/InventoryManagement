@@ -1,12 +1,15 @@
 import MainPage from "./components/MainPage";
 import LoginPage from "./components/LoginPage";
+import AccountPage from "./components/AccountPage";
 import {
   BrowserRouter as Router,
   Routes,
   Route,
-  Navigate
+  Navigate,
+  useNavigate
 } from "react-router-dom";
-import check from "./util/CheckToken";
+import { useEffect } from 'react'
+import axios from "axios";
 
 function App() {
   return (
@@ -17,6 +20,11 @@ function App() {
             <MainPage />
           </CheckAuth>
         } />
+        <Route path="/account" element={
+          <CheckAuth>
+            <AccountPage />
+          </CheckAuth>
+        } />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/" element={<Navigate to="/login" replace={true} />} />
       </Routes>
@@ -25,16 +33,18 @@ function App() {
 }
 
 function CheckAuth({ children }) {
+  const navigate = useNavigate();
   const token = localStorage.getItem("IMTOKEN");
-  if (!token) {
-    return (<Navigate to="/login" replace={true} />);
-  }
-
-  const user = check(token);
-
-  if (!user) { // TODO: bug when token expires
-    return (<Navigate to="/login" replace={true} />);
-  }
+  useEffect(() => {
+    async function check() {
+      await axios.get("http://localhost:8080/api/account/token/" + token)
+      .catch(function (error) {
+          localStorage.removeItem('IMTOKEN');
+          navigate('/login')
+      });
+    }
+    check();
+  });
 
   return children
 }

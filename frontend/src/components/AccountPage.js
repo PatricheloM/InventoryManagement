@@ -1,6 +1,6 @@
 import Header from '../layout/Header';
 
-export default function MainPage() {
+export default function AccountPage() {
     return (
         <>
             <Header>
