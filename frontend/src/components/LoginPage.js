@@ -8,7 +8,7 @@ import {
     Stack,
     InputLeftElement,
     Box,
-    Avatar,
+    Image,
     FormControl,
     InputRightElement,
     useToast
@@ -37,7 +37,7 @@ export default function LoginPage() {
       if (token) {
         check();
       }
-    });
+    }, []);
 
     async function getStoreData(e) {
         e.preventDefault();
@@ -83,7 +83,7 @@ export default function LoginPage() {
                 justifyContent="center"
                 alignItems="center"
             >
-                <Avatar bg="teal.500" />
+                <Image boxSize={32} src={require('../img/logo.png')} />
                 <Heading color="teal.400">Inventory Management</Heading>
                 <Box minW={{ base: "90%", md: "468px" }}>
                     <form>

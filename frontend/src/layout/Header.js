@@ -1,4 +1,4 @@
-import { Grid, GridItem, Box, Center, Flex, Text } from '@chakra-ui/react'
+import { Grid, GridItem, Box, Center, Flex, Text, Image, Button, Heading } from '@chakra-ui/react'
 import axios from 'axios'
 import { useState, useEffect } from 'react'
 import { useNavigate } from "react-router-dom";
@@ -28,6 +28,20 @@ export default function Header({ children }) {
     return (
         <>
             <Center marginBottom="2vh">
+                <Box marginRight="1vw">
+                    <Flex
+                        flexDirection="column"
+                        justifyContent="center"
+                        alignItems="center"
+                        p="1vh"
+                        marginTop="1vh"
+                    >
+                        <Button onClick={() => navigate('/main')} boxShadow="md" minH={24} minW={24} display="inline" textAlign="center">
+                                <Image ml="2" boxSize={16} src={require('../img/logo.png')} />
+                                <Heading size="l" color="teal.500">Main Page</Heading>
+                        </Button>
+                    </Flex>
+                </Box>
                 <Box p={4} marginTop="1vh" backgroundColor="whiteAlpha.900" boxShadow="md" >
                     <Grid templateColumns='repeat(4, 1fr)' gap={6} >
                         <GridItem><Center><Box as='button' onClick={() => navigate('/importing')} minWidth="20vh" borderRadius='md' bg='teal.500' color='white' px={4} h={8}>Import</Box></Center></GridItem>

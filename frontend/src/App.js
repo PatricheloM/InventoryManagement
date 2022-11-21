@@ -10,7 +10,7 @@ import {
   Navigate,
   useNavigate
 } from "react-router-dom";
-import { Button, Center, Flex, Heading, Stack, useToast } from "@chakra-ui/react";
+import { Button, Flex, Heading, Stack, useToast } from "@chakra-ui/react";
 import { useEffect } from 'react'
 import axios from "axios";
 
@@ -95,7 +95,7 @@ function CheckAuth({ children }) {
         });
     }
     check();
-  });
+  }, []);
 
   return children
 }
