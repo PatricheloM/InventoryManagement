@@ -8,6 +8,7 @@ import {
   Navigate,
   useNavigate
 } from "react-router-dom";
+import { useToast } from "@chakra-ui/react";
 import { useEffect } from 'react'
 import axios from "axios";
 
@@ -34,12 +35,19 @@ function App() {
 
 function CheckAuth({ children }) {
   const navigate = useNavigate();
+  const toast = useToast();
   const token = localStorage.getItem("IMTOKEN");
   useEffect(() => {
     async function check() {
       await axios.get("http://localhost:8080/api/account/token/" + token)
       .catch(function (error) {
           localStorage.removeItem('IMTOKEN');
+          toast({
+            title: 'Your session expired!',
+            status: 'error',
+            duration: 3000,
+            isClosable: true,
+          })
           navigate('/login')
       });
     }
