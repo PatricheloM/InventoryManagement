@@ -96,6 +96,7 @@ public class AccountController {
             try {
                 if (JsonValidator.validate(JsonFactory.produce(object), AccountDTO.class)) {
                     AccountDTO account = modelMapper.map(object, AccountDTO.class);
+                    account.setUsername(account.getUsername().toLowerCase());
                     if (accountService.saveAccount(account)) {
                         return ResponseEntityFactory.produce(InventoryManagementStringTools.getSuccessfulRegistrationMsg(),
                                 HttpStatus.OK, PATH + "/register");
@@ -121,7 +122,7 @@ public class AccountController {
     @PatchMapping(value = "/{username}", produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> changePassword(@PathVariable("username")String username, @RequestParam String newPassword, @RequestParam String token) {
         if (authorizationCheck.check(new Object(){}.getClass().getEnclosingMethod(), token) ) {
-            if (accountService.changePassword(username, newPassword)) {
+            if (accountService.changePassword(username.toLowerCase(), newPassword)) {
                 return ResponseEntityFactory.produce(InventoryManagementStringTools.getSuccessfulPasswordChangeMsg(),
                         HttpStatus.OK, PATH + "/" + username);
             } else {
@@ -142,7 +143,7 @@ public class AccountController {
     @DeleteMapping(value = "/{username}", produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> deleteUser(@PathVariable("username") String username, @RequestParam String token) {
         if (authorizationCheck.check(new Object(){}.getClass().getEnclosingMethod(), token) ) {
-            if (accountService.deleteAccount(username)) {
+            if (accountService.deleteAccount(username.toLowerCase())) {
                 for (TokenDTO t : accountService.getTokens()) {
                     if (username.equals(t.getUsername())) {
                         accountService.deleteToken(t.getToken());
@@ -178,7 +179,7 @@ public class AccountController {
     @GetMapping(value = "/{username}", produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> getUser(@PathVariable("username") String username, @RequestParam String token) {
         if (authorizationCheck.check(new Object(){}.getClass().getEnclosingMethod(), token) ) {
-            Optional<AccountDTO> account = accountService.fetchAccountByUsername(username);
+            Optional<AccountDTO> account = accountService.fetchAccountByUsername(username.toLowerCase());
             return account.<ResponseEntity<Object>>map(accountDTO -> new ResponseEntity<>(accountDTO, HttpStatus.OK))
                     .orElseGet(() -> ResponseEntityFactory.produce(InventoryManagementStringTools.getUserDoesNotExistMsg(),
                             HttpStatus.NOT_FOUND, PATH + "/" + username));
