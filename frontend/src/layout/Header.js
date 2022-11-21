@@ -30,8 +30,8 @@ export default function Header({ children }) {
             <Center marginBottom="2vh">
                 <Box p={4} marginTop="1vh" backgroundColor="whiteAlpha.900" boxShadow="md" >
                     <Grid templateColumns='repeat(4, 1fr)' gap={6} >
-                        <GridItem><Center><Box as='button' minWidth="20vh" borderRadius='md' bg='teal.500' color='white' px={4} h={8}>Import</Box></Center></GridItem>
-                        <GridItem><Center><Box as='button' minWidth="20vh" borderRadius='md' bg='teal.500' color='white' px={4} h={8}>Export</Box></Center></GridItem>
+                        <GridItem><Center><Box as='button' onClick={() => navigate('/importing')} minWidth="20vh" borderRadius='md' bg='teal.500' color='white' px={4} h={8}>Import</Box></Center></GridItem>
+                        <GridItem><Center><Box as='button' onClick={() => navigate('/exporting')} minWidth="20vh" borderRadius='md' bg='teal.500' color='white' px={4} h={8}>Export</Box></Center></GridItem>
                         <GridItem><Center><Box as='button' onClick={() => navigate('/account')} minWidth="20vh" borderRadius='md' bg='green.500' color='white' px={4} h={8}>Account</Box></Center></GridItem>
                         <GridItem><Center><Box as='button' onClick={() => logout()} minWidth="20vh" borderRadius='md' bg='tomato' color='white' px={4} h={8}>Logout</Box></Center></GridItem>
                     </Grid>

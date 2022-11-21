@@ -392,7 +392,7 @@ export default function AccountPage() {
 
             <Header>
                 <Container p={4} backgroundColor="whiteAlpha.900" boxShadow="md" centerContent>
-                    <Avatar bg="teal.500" />
+                    <Avatar bg="teal.500" w={16} h={16} />
                     <Heading color="teal.400">Account</Heading>
                     <Box marginTop="2vh" padding='4' bg="gray.100" color='black' maxW='md'>
                         <Grid templateColumns='repeat(1, 4fr)' gap={6} >

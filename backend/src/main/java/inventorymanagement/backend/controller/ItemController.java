@@ -46,7 +46,7 @@ public class ItemController {
     @Autowired
     AuthorizationCheck authorizationCheck;
 
-    @Authorization(privileges = { AccountPrivilege.ADMIN, AccountPrivilege.IMPORTER})
+    @Authorization(privileges = { AccountPrivilege.ADMIN, AccountPrivilege.IMPORTER, AccountPrivilege.IMPORTER_EXPORTER})
     @PostMapping(value = "/importing", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> importing(@RequestBody Object object, @RequestParam String token) {
         if (authorizationCheck.check(new Object(){}.getClass().getEnclosingMethod(), token)) {
@@ -69,7 +69,7 @@ public class ItemController {
         }
     }
 
-    @Authorization(privileges = { AccountPrivilege.ADMIN, AccountPrivilege.EXPORTER})
+    @Authorization(privileges = { AccountPrivilege.ADMIN, AccountPrivilege.EXPORTER, AccountPrivilege.IMPORTER_EXPORTER})
     @PostMapping(value = "/exporting", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> exporting(@RequestBody Object object, @RequestParam String token) {
         if (authorizationCheck.check(new Object(){}.getClass().getEnclosingMethod(), token)) {
