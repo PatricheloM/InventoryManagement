@@ -1,4 +1,4 @@
-import { Box, Center, Container, FormControl, FormLabel, Heading, Input, NumberDecrementStepper, NumberIncrementStepper, NumberInput, NumberInputField, NumberInputStepper, Select, useToast } from "@chakra-ui/react";
+import { Box, Center, Container, FormControl, FormLabel, Heading, Input, NumberDecrementStepper, NumberIncrementStepper, NumberInput, NumberInputField, NumberInputStepper, Select, Spinner, useToast } from "@chakra-ui/react";
 import Header from "../layout/Header";
 import { ArrowDownIcon } from '@chakra-ui/icons'
 import { useEffect, useState } from "react";
@@ -11,6 +11,7 @@ export default function ImportPage() {
     const navigate = useNavigate();
     const token = localStorage.getItem('IMTOKEN');
     const [ownUser, setOwnUser] = useState();
+    const [importButtonDisabled, setImportButtonDisabled] = useState(false);
 
     const [name, setName] = useState("");
     const [weight, setWeight] = useState("");
@@ -26,7 +27,7 @@ export default function ImportPage() {
 
     async function getStoreItem(e) {
         e.preventDefault();
-
+        setImportButtonDisabled(true);
         axios.post("http://localhost:8080/api/item/importing?token=" + token, {
             "name": name,
             "weight": Number(weight),
@@ -56,6 +57,7 @@ export default function ImportPage() {
                         duration: 3000,
                         isClosable: true,
                     })
+                    setImportButtonDisabled(false);
                 }
                 if (error.response.data.status === 400) {
                     toast({
@@ -65,6 +67,7 @@ export default function ImportPage() {
                         duration: 3000,
                         isClosable: true,
                     })
+                    setImportButtonDisabled(false);
                 }
                 if (error.response.data.status === 500) {
                     toast({
@@ -73,6 +76,7 @@ export default function ImportPage() {
                         duration: 3000,
                         isClosable: true,
                     })
+                    setImportButtonDisabled(false);
                 }
             });
     }
@@ -118,7 +122,18 @@ export default function ImportPage() {
                             </NumberInput>
                         </FormControl>
                     </Box>
-                    <Center><Box as='button' onClick={(e) => getStoreItem(e)} borderRadius='md' bg='teal.500' color='white' mt="2vh" px={4} h={8} minW="70vh">Import</Box></Center>
+                    <Center>
+                        <Spinner   
+                            thickness='4px'
+                            speed='0.65s'
+                            emptyColor='gray.200'
+                            color='teal.500'
+                            size='xl'
+                            display={importButtonDisabled ? "block" : "none"} />
+                    </Center>
+                    <Center>
+                        <Box as='button' display={importButtonDisabled ? "none" : "block"} disabled={importButtonDisabled} onClick={(e) => getStoreItem(e)} borderRadius='md' bg='teal.500' color='white' mt="2vh" px={4} h={8} minW="70vh">Import</Box>
+                    </Center>
                 </Container>
             </Header>
         </>

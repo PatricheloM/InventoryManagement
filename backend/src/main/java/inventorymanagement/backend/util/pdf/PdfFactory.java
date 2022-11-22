@@ -33,7 +33,7 @@ public class PdfFactory {
         Element name = document.getElementById("name");
         name.text(item.getName());
         Element weight = document.getElementById("weight");
-        weight.text(String.valueOf(item.getWeight()));
+        weight.text(item.getWeight() + " kg");
         Element company = document.getElementById("company");
         company.text(item.getCompany());
         Element arrival = document.getElementById("arrival");
