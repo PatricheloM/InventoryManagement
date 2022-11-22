@@ -123,7 +123,8 @@ export default function ImportPage() {
                         </FormControl>
                     </Box>
                     <Center>
-                        <Spinner   
+                        <Spinner 
+                            mt="1vh"
                             thickness='4px'
                             speed='0.65s'
                             emptyColor='gray.200'
