@@ -8,26 +8,31 @@ export default function MainPage() {
     const toast = useToast();
     const token = localStorage.getItem('IMTOKEN');
 
+    let itemList = [];
+    const [title, setTitle] = useState([]);
+    title.forEach((item, key) => {
+        itemList.push(
+            <GridItem>
+                <Box id={key}>
+                    {item.name}
+                </Box>
+            </GridItem>
+        );
+    });
     useEffect(() => {
-        axios.get("http://localhost:8080/api/item/item?token=" + token)
-            .then(function (response) {
-                console.log(response.data);
-            })
-            .catch(function (error) {
-                toast({
-                    title: 'Internal server error!',
-                    status: 'error',
-                    duration: 3000,
-                    isClosable: true,
-                })
-            })
-    }, [])
+        async function getStoreData() {
+            const response = await axios.get("http://localhost:8080/api/item/item?token=" + token);
+            setTitle(response.data);
+        }
+        getStoreData();
+    }, []);
 
 
     return (
         <>
             <Header>
                 <Grid templateColumns='repeat(4, 1fr)' gap={6}>
+                    {itemList}
                 </Grid>
             </Header>
         </>

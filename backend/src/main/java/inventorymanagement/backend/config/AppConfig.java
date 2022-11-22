@@ -18,6 +18,7 @@ import redis.clients.jedis.JedisPoolConfig;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
 import java.util.Date;
 
 @Configuration
@@ -33,10 +34,10 @@ public class AppConfig {
             throw new ConfigNotFoundException(e);
         }
         JedisPoolConfig jedisPoolConfig = new JedisPoolConfig();
-        jedisPoolConfig.setMaxTotal(500);
-        jedisPoolConfig.setMaxIdle(500);
-        jedisPoolConfig.setMaxWaitMillis(3000);
-        return new JedisPool(jedisPoolConfig, redisConfig.getHost(), redisConfig.getPort(), 3000, redisConfig.getPassword());
+        jedisPoolConfig.setMaxTotal(redisConfig.getMaxPool());
+        jedisPoolConfig.setMaxIdle(redisConfig.getMaxIdlePool());
+        jedisPoolConfig.setMinIdle(redisConfig.getMinIdlePool());
+        return new JedisPool(jedisPoolConfig, redisConfig.getHost(), redisConfig.getPort(), redisConfig.getTimeout(), redisConfig.getPassword());
     }
 
 
