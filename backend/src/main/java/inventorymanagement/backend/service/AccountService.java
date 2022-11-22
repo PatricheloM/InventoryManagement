@@ -14,7 +14,7 @@ public interface AccountService {
     boolean changePassword(String username, String newPassword);
     boolean deleteAccount(String username);
     boolean accountExists(String username);
-    boolean saveToken(TokenDTO token);
+    void saveToken(TokenDTO token);
     boolean deleteToken(String token);
     Optional<TokenDTO> getToken(String token);
     List<TokenDTO> getTokens();

@@ -32,7 +32,7 @@ public class ItemRepositoryImpl implements ItemRepository {
 
     @Override
     public void saveItem(Item item) {
-        int id = redisRepository.incrBy(InventoryManagementStringTools.getItemIdKey(), 1);
+        int id = redisRepository.incrby(InventoryManagementStringTools.getItemIdKey(), 1);
         redisRepository.sadd(InventoryManagementStringTools.getItemSetKey(), String.valueOf(id));
         redisRepository.hmset("ITEM_" + id, Map.of(
                 "name", item.getName(),

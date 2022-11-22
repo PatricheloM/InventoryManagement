@@ -67,8 +67,8 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public boolean saveToken(TokenDTO token) {
-        return accountRepository.saveToken(modelMapper.map(token, Token.class));
+    public void saveToken(TokenDTO token) {
+        accountRepository.saveToken(modelMapper.map(token, Token.class));
     }
 
     @Override

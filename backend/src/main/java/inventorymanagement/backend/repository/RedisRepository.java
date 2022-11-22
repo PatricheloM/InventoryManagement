@@ -1,117 +1,85 @@
 package inventorymanagement.backend.repository;
 
-import org.springframework.data.redis.connection.RedisConnection;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+import redis.clients.jedis.JedisPool;
 
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 
+@Repository
 public class RedisRepository{
 
-    Charset UTF8 = StandardCharsets.UTF_8;
+    @Autowired
+    JedisPool jedisPool;
 
-    RedisConnection connection;
-
-    public RedisRepository(RedisConnection connection) {
-        this.connection = connection;
+    public void set(String key, String value)
+    {
+        jedisPool.getResource().set(key, value);
     }
 
-    public boolean set(String key, String value)
+    public int del(String... key)
     {
-        return Boolean.TRUE.equals(connection.set(key.getBytes(UTF8), value.getBytes(UTF8)));
-    }
-
-    public Long del(String key)
-    {
-        return connection.del(key.getBytes(UTF8));
+        return jedisPool.getResource().del(key).intValue();
     }
 
     public void hmset(String key, Map<String, String> values)
     {
-        Map<byte[], byte[]> byteValues = new HashMap<>();
-        for (String mapKey : values.keySet())
-        {
-            byteValues.put(mapKey.getBytes(UTF8), values.get(mapKey).getBytes(UTF8));
-        }
-        connection.hMSet(key.getBytes(UTF8), byteValues);
+        jedisPool.getResource().hmset(key, values);
     }
 
-    public void sadd(String key, String value)
+    public int sadd(String key, String... value)
     {
-        connection.sAdd(key.getBytes(UTF8), value.getBytes(UTF8));
+        return jedisPool.getResource().sadd(key, value).intValue();
     }
 
-    public Long srem(String key, String value)
+    public int srem(String key, String... value)
     {
-        return connection.sRem(key.getBytes(UTF8), value.getBytes(UTF8));
+        return jedisPool.getResource().srem(key, value).intValue();
     }
 
     public Map<String, String> hgetall(String key)
     {
-        Map<byte[], byte[]> byteValues = connection.hGetAll(key.getBytes(UTF8));
-        Map<String, String> values = new HashMap<>();
-
-        if (byteValues != null)
-        {
-            for (byte[] bytes : byteValues.keySet())
-            {
-                values.put(new String(bytes, UTF8), new String(byteValues.get(bytes), UTF8));
-            }
+        Map<String, String> values = jedisPool.getResource().hgetAll(key);
+        if (!values.isEmpty()) {
             return values;
-        }
-        else
-        {
+        } else {
             return Collections.emptyMap();
         }
     }
 
     public List<String> smembers(String key)
     {
-        Set<byte[]> byteValues = connection.sMembers(key.getBytes(UTF8));
-        List<String> values = new ArrayList<>();
-        if (byteValues != null)
-        {
-            for (byte[] bytes : byteValues)
-            {
-                values.add(new String(bytes, UTF8));
-            }
+        List<String> values = new ArrayList<>(jedisPool.getResource().smembers(key));
+        if (!values.isEmpty()) {
             return values;
-        }
-        else
-        {
+        } else {
             return Collections.emptyList();
         }
     }
 
     public boolean sismember(String key, String value)
     {
-        return Boolean.TRUE.equals(connection.sIsMember(key.getBytes(UTF8), value.getBytes(UTF8)));
+        return jedisPool.getResource().sismember(key, value);
     }
 
-    public boolean setex(String key, String value, int expiration) {
-        return Boolean.TRUE.equals(connection.setEx(key.getBytes(UTF8), expiration, value.getBytes(UTF8)));
+    public void setex(String key, String value, int expiration) {
+        jedisPool.getResource().setex(key, expiration, value);
     }
 
     public boolean exists(String key) {
-        return Boolean.TRUE.equals(connection.exists(key.getBytes(UTF8)));
+        return jedisPool.getResource().exists(key);
     }
 
     public String get(String key) {
-        Optional<byte[]> bytes = Optional.ofNullable(connection.get(key.getBytes(UTF8)));
-        return bytes.map(String::new).orElse("");
+        return jedisPool.getResource().get(key);
     }
 
-    public Map<String, String> keys(String regex) {
-        Map<String, String> map = new HashMap<>();
-        for (byte[] bytes : connection.keys(regex.getBytes(UTF8))) {
-            String key = new String(bytes, UTF8);
-            map.put(key, get(key));
-        }
-        return map;
+    public List<String> keys(String regex) {
+        return new ArrayList<>(jedisPool.getResource().keys(regex));
     }
 
-    public int incrBy(String key, int value) {
-        return connection.incrBy(key.getBytes(UTF8), value).intValue();
+    public int incrby(String key, int value) {
+        return jedisPool.getResource().incrBy(key, value).intValue();
     }
 }

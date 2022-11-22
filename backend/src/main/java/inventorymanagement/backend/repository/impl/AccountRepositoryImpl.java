@@ -94,8 +94,8 @@ public class AccountRepositoryImpl implements AccountRepository {
     }
 
     @Override
-    public boolean saveToken(Token token) {
-        return redisRepository.setex(token.getToken(), token.getUsername(), 86400);
+    public void saveToken(Token token) {
+        redisRepository.setex(token.getToken(), token.getUsername(), 86400);
     }
 
     @Override
@@ -123,11 +123,11 @@ public class AccountRepositoryImpl implements AccountRepository {
     @Override
     public List<Token> getTokens() {
         List<Token> tokens = new ArrayList<>();
-        Map<String, String> map = redisRepository.keys("*-*-*-*-*");
-        for (String key : map.keySet()) {
+        List<String> list = redisRepository.keys("*-*-*-*-*");
+        for (String key : list) {
             Token t = new Token();
             t.setToken(key);
-            t.setUsername(map.get(key));
+            t.setUsername(redisRepository.get(key));
             tokens.add(t);
         }
         return tokens.isEmpty() ? Collections.emptyList() : tokens;

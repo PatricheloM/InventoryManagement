@@ -51,7 +51,7 @@ export default function Header({ children }) {
                 setUser(
                     {
                         username: "Unknown user",
-                        privilege: "(LOG IN)"
+                        privilege: "LOG IN"
                     }
                 );
             })
