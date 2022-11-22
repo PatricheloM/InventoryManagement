@@ -1,4 +1,4 @@
-import { Box, Center, Container, FormControl, FormLabel, Heading, Input, NumberDecrementStepper, NumberIncrementStepper, NumberInput, NumberInputField, NumberInputStepper, Select, Spinner, useToast } from "@chakra-ui/react";
+import { Box, Button, Center, Container, FormControl, FormLabel, Heading, Input, NumberDecrementStepper, NumberIncrementStepper, NumberInput, NumberInputField, NumberInputStepper, Select, Spinner, useToast } from "@chakra-ui/react";
 import Header from "../layout/Header";
 import { ArrowDownIcon } from '@chakra-ui/icons'
 import { useEffect, useState } from "react";
@@ -133,7 +133,7 @@ export default function ImportPage() {
                             display={importButtonDisabled ? "block" : "none"} />
                     </Center>
                     <Center>
-                        <Box as='button' display={importButtonDisabled ? "none" : "block"} disabled={importButtonDisabled} onClick={(e) => getStoreItem(e)} borderRadius='md' bg='teal.500' color='white' mt="2vh" px={4} h={8} minW="70vh">Import</Box>
+                        <Button display={importButtonDisabled ? "none" : "block"} disabled={importButtonDisabled} onClick={(e) => getStoreItem(e)} borderRadius='md' colorScheme="teal" mt="2vh" px={4} h={8} minW="70vh">Import</Button>
                     </Center>
                 </Container>
             </Header>

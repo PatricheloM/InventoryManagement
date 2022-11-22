@@ -316,21 +316,22 @@ export default function MainPage() {
                                 setQueryValue(startDate.toLocaleDateString("en-US") + " - " + endDate.toLocaleDateString("en-US"));
                                 onCloseD();
 
-                            }
-                            if (typeof startDate === 'undefined' && typeof endDate === 'undefined') {
-                                toast({
-                                    title: 'Give a start and an end date!',
-                                    status: 'error',
-                                    duration: 3000,
-                                    isClosable: true,
-                                })
                             } else {
-                                toast({
-                                    title: 'Start date must be before end date!',
-                                    status: 'error',
-                                    duration: 3000,
-                                    isClosable: true,
-                                })
+                                if (typeof startDate === 'undefined' && typeof endDate === 'undefined') {
+                                    toast({
+                                        title: 'Give a start and an end date!',
+                                        status: 'error',
+                                        duration: 3000,
+                                        isClosable: true,
+                                    })
+                                } else {
+                                    toast({
+                                        title: 'Start date must be before end date!',
+                                        status: 'error',
+                                        duration: 3000,
+                                        isClosable: true,
+                                    })
+                                }
                             }
                         }}
                             variant="solid"
