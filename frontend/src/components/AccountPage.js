@@ -23,6 +23,15 @@ export default function AccountPage() {
     const [company, setCompany] = useState("");
     const [email, setEmail] = useState("");
 
+    function setNullState(openFunc) {
+        setUser("");
+        setPass("");
+        setPrivilege("");
+        setCompany("");
+        setEmail("");
+        openFunc();
+    }
+
     useEffect(() => {
         axios.get("http://localhost:8080/api/account/token/" + token)
             .then(function (response) {
@@ -51,10 +60,6 @@ export default function AccountPage() {
                     duration: 3000,
                     isClosable: true,
                 })
-                setUser("");
-                setPass("");
-                setCompany("");
-                setEmail("");
                 onCloseReg();
             })
             .catch(function (error) {
@@ -104,8 +109,6 @@ export default function AccountPage() {
                     duration: 3000,
                     isClosable: true,
                 })
-                setUser("");
-                setPass("");
                 onClosePw();
             })
             .catch(function (error) {
@@ -186,7 +189,6 @@ export default function AccountPage() {
                 duration: 3000,
                 isClosable: true,
             })
-            setUser("");
             onCloseD();
         })
         .catch(function (error) {
@@ -396,10 +398,10 @@ export default function AccountPage() {
                     <Heading color="teal.400">Account</Heading>
                     <Box marginTop="2vh" padding='4' bg="gray.100" color='black' maxW='md'>
                         <Grid templateColumns='repeat(1, 4fr)' gap={6} >
-                            <GridItem><Center><Box as='button' onClick={onOpenU} minWidth="40vh" borderRadius='md' bg='teal.500' color='white' px={4} h={8}>Search for user</Box></Center></GridItem>
-                            <GridItem><Center><Box as='button' onClick={onOpenReg} minWidth="40vh" borderRadius='md' bg='teal.300' color='white' px={4} h={8}>Create new</Box></Center></GridItem>
-                            <GridItem><Center><Box as='button' onClick={onOpenPw} minWidth="40vh" borderRadius='md' bg='teal.300' color='white' px={4} h={8}>Change password</Box></Center></GridItem>
-                            <GridItem><Center><Box as='button' onClick={onOpenD} minWidth="40vh" borderRadius='md' bg='tomato' color='white' px={4} h={8}>Delete user</Box></Center></GridItem>
+                            <GridItem><Center><Box as='button' onClick={() => setNullState(onOpenU)} minWidth="40vh" borderRadius='md' bg='teal.500' color='white' px={4} h={8}>Search for user</Box></Center></GridItem>
+                            <GridItem><Center><Box as='button' onClick={() => setNullState(onOpenReg)} minWidth="40vh" borderRadius='md' bg='teal.300' color='white' px={4} h={8}>Create new</Box></Center></GridItem>
+                            <GridItem><Center><Box as='button' onClick={() => setNullState(onOpenPw)} minWidth="40vh" borderRadius='md' bg='teal.300' color='white' px={4} h={8}>Change password</Box></Center></GridItem>
+                            <GridItem><Center><Box as='button' onClick={() => setNullState(onOpenD)} minWidth="40vh" borderRadius='md' bg='tomato' color='white' px={4} h={8}>Delete user</Box></Center></GridItem>
                         </Grid>
                     </Box>
                 </Container>

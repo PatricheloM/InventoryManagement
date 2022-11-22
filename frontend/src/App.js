@@ -69,7 +69,7 @@ function PageNotFound() {
             <Heading>
               Page not found
             </Heading>
-            <Button colorScheme="teal" onClick={() => navigate('/main')}>Back to main page</Button>
+            <Button colorScheme="teal" onClick={() => navigate('/login')}>Back to main page</Button>
         </Stack>
       </Flex>
     </>
