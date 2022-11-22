@@ -52,7 +52,7 @@ export default function ImportPage() {
             .catch(function (error) {
                 if (error.response.data.status === 401) {
                     toast({
-                        title: 'You can\'t export!',
+                        title: 'You can\'t import!',
                         status: 'error',
                         duration: 3000,
                         isClosable: true,

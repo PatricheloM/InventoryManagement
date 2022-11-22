@@ -91,14 +91,14 @@ public class ItemRepositoryImpl implements ItemRepository {
     public List<Item> fetchItemByName(String name) {
         return redisRepository.smembers(InventoryManagementStringTools.getItemSetKey())
                 .stream().map(id -> fetchItem(Integer.parseInt(id)).get())
-                .filter(itemName -> itemName.getName().equals(name)).collect(Collectors.toList());
+                .filter(itemName -> itemName.getName().equalsIgnoreCase(name)).collect(Collectors.toList());
     }
 
     @Override
     public List<Item> fetchItemByCompany(String company) {
         return redisRepository.smembers(InventoryManagementStringTools.getItemSetKey())
                 .stream().map(id -> fetchItem(Integer.parseInt(id)).get())
-                .filter(companyName -> companyName.getCompany().equals(company)).collect(Collectors.toList());
+                .filter(companyName -> companyName.getCompany().equalsIgnoreCase(company)).collect(Collectors.toList());
     }
 
     @Override
