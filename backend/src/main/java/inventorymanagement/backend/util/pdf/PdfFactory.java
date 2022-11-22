@@ -13,20 +13,17 @@ import java.io.IOException;
 
 public class PdfFactory {
     public static byte[] produce(ItemDTO item, ImportExport type) {
+
         Document document;
 
-        if (type == ImportExport.IMPORT) {
-            try {
+        try {
+            if (type == ImportExport.IMPORT) {
                 document = Jsoup.parse(PdfFactory.class.getResourceAsStream("import.html"), "UTF-8", "");
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        } else {
-            try {
+            } else {
                 document = Jsoup.parse(PdfFactory.class.getResourceAsStream("export.html"), "UTF-8", "");
-            } catch (IOException e) {
-                throw new RuntimeException(e);
             }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
 
         document.outputSettings().syntax(Document.OutputSettings.Syntax.xml);
@@ -49,6 +46,7 @@ public class PdfFactory {
         renderer.layout();
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         renderer.createPDF(baos);
+
         return baos.toByteArray();
     }
 }
