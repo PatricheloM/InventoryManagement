@@ -11,13 +11,16 @@ import {
     Image,
     FormControl,
     InputRightElement,
-    useToast
+    useToast,
+    Spinner,
+    Center
 } from "@chakra-ui/react";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 
 export default function LoginPage() {
+    const [loginButtonDisabled, setLoginButtonDisabled] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const handleShowClick = () => setShowPassword(!showPassword);
     const [user, setUser] = useState("");
@@ -28,15 +31,15 @@ export default function LoginPage() {
 
     const token = localStorage.getItem("IMTOKEN");
     useEffect(() => {
-      async function check() {
-        await axios.get("http://localhost:8080/api/account/token/" + token)
-        .then(function (response) {
-            navigate('/main');
-        })
-      }
-      if (token) {
-        check();
-      }
+        async function check() {
+            await axios.get("http://localhost:8080/api/account/token/" + token)
+                .then(function (response) {
+                    navigate('/main');
+                })
+        }
+        if (token) {
+            check();
+        }
     }, []);
 
     async function getStoreData(e) {
@@ -66,6 +69,7 @@ export default function LoginPage() {
                         isClosable: true,
                     })
                 }
+                setLoginButtonDisabled(false);
             });
     }
 
@@ -124,16 +128,31 @@ export default function LoginPage() {
                                     </InputRightElement>
                                 </InputGroup>
                             </FormControl>
-                            <Button
-                                borderRadius='xl'
-                                type="submit"
-                                variant="solid"
-                                colorScheme="teal"
-                                width="full"
-                                onClick={(e) => getStoreData(e)}
-                            >
-                                Login
-                            </Button>
+                            <Center>
+                                <Button
+                                    display={loginButtonDisabled ? "none" : "block"}
+                                    disabled={loginButtonDisabled}
+                                    borderRadius='xl'
+                                    type="submit"
+                                    variant="solid"
+                                    colorScheme="teal"
+                                    width="full"
+                                    onClick={(e) => {
+                                        setLoginButtonDisabled(true);
+                                        getStoreData(e);
+                                    }}
+                                >
+                                    Login
+                                </Button>
+                                <Spinner
+                                    mt="1vh"
+                                    thickness='4px'
+                                    speed='0.65s'
+                                    emptyColor='gray.200'
+                                    color='teal.500'
+                                    size='xl'
+                                    display={loginButtonDisabled ? "block" : "none"} />
+                            </Center>
                         </Stack>
                     </form>
                 </Box>

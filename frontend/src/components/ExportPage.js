@@ -6,12 +6,12 @@ import { SingleDatepicker } from "chakra-dayzed-datepicker";
 import { useNavigate } from 'react-router-dom';
 
 export default function ExportPage() {
-    const [importButtonDisabled, setImportButtonDisabled] = useState(false);
+    const [exportButtonDisabled, setExportButtonDisabled] = useState(false);
     const navigate = useNavigate();
 
     async function getStoreItem(e, obj) {
         e.preventDefault();
-        setImportButtonDisabled(true);
+        setExportButtonDisabled(true);
         axios.post("http://localhost:8080/api/item/exporting?token=" + token, obj)
             .then(function (response) {
                 toast({
@@ -35,7 +35,7 @@ export default function ExportPage() {
                         duration: 3000,
                         isClosable: true,
                     })
-                    setImportButtonDisabled(false);
+                    setExportButtonDisabled(false);
                 }
                 if (error.response.data.status === 400) {
                     toast({
@@ -45,7 +45,7 @@ export default function ExportPage() {
                         duration: 3000,
                         isClosable: true,
                     })
-                    setImportButtonDisabled(false);
+                    setExportButtonDisabled(false);
                 }
                 if (error.response.data.status === 500) {
                     toast({
@@ -54,7 +54,7 @@ export default function ExportPage() {
                         duration: 3000,
                         isClosable: true,
                     })
-                    setImportButtonDisabled(false);
+                    setExportButtonDisabled(false);
                 }
             });
     }
@@ -151,8 +151,8 @@ export default function ExportPage() {
                                     emptyColor='gray.200'
                                     color='teal.500'
                                     size='xl'
-                                    display={importButtonDisabled ? "block" : "none"} />
-                                <Button width="100%" display={importButtonDisabled ? "none" : "block"} disabled={importButtonDisabled} onClick={(e) => getStoreItem(e, card.at(key))}>Export</Button>
+                                    display={exportButtonDisabled ? "block" : "none"} />
+                                <Button width="100%" display={exportButtonDisabled ? "none" : "block"} disabled={exportButtonDisabled} onClick={(e) => getStoreItem(e, card.at(key))}>Export</Button>
                             </Center>
                         </Stack>
                     </CardBody>
