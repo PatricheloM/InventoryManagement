@@ -1,48 +1,56 @@
 package inventorymanagement.backend.util.pdf;
 
+import com.github.mustachejava.DefaultMustacheFactory;
+import com.github.mustachejava.Mustache;
+import com.github.mustachejava.MustacheFactory;
 import inventorymanagement.backend.dto.ItemDTO;
 import inventorymanagement.backend.util.enums.ImportExport;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
 import org.xhtmlrenderer.layout.SharedContext;
 import org.xhtmlrenderer.pdf.ITextRenderer;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.StringWriter;
+import java.io.Writer;
+import java.util.Date;
+import java.util.HashMap;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class PdfFactory {
     public static byte[] produce(ItemDTO item, ImportExport type) {
 
-        Document document;
+        Mustache mustache;
+        MustacheFactory mf = new DefaultMustacheFactory();
+
+        Writer writer = new StringWriter();
+        HashMap<String, Object> scopes = new HashMap<>();
+        scopes.put("ITEMNAME", item.getName());
+        scopes.put("ITEMWEIGHT", item.getWeight() + " kg");
+        scopes.put("COMPANY", item.getCompany());
+        scopes.put("ARRIVAL", item.getArrival().toString());
+        scopes.put("LOCATION", item.getLocation());
 
         try {
             if (type == ImportExport.IMPORT) {
-                document = Jsoup.parse(PdfFactory.class.getResourceAsStream("import.html"), "UTF-8", "");
+                String name = "import.mustache";
+                mustache = mf.compile(new InputStreamReader(PdfFactory.class.getResourceAsStream(name), UTF_8), name);
             } else {
-                document = Jsoup.parse(PdfFactory.class.getResourceAsStream("export.html"), "UTF-8", "");
+                scopes.put("DEPARTURE", new Date().toString());
+                String name = "export.mustache";
+                mustache = mf.compile(new InputStreamReader(PdfFactory.class.getResourceAsStream(name), UTF_8), name);
             }
-        } catch (IOException e) {
+        } catch (NullPointerException e) {
             throw new RuntimeException(e);
         }
 
-        document.outputSettings().syntax(Document.OutputSettings.Syntax.xml);
-        Element name = document.getElementById("name");
-        name.text(item.getName());
-        Element weight = document.getElementById("weight");
-        weight.text(item.getWeight() + " kg");
-        Element company = document.getElementById("company");
-        company.text(item.getCompany());
-        Element arrival = document.getElementById("arrival");
-        arrival.text(item.getArrival().toString());
-        Element location = document.getElementById("location");
-        location.text(item.getLocation());
+        mustache.execute(writer, scopes);
 
         ITextRenderer renderer = new ITextRenderer();
         SharedContext sharedContext = renderer.getSharedContext();
         sharedContext.setPrint(true);
         sharedContext.setInteractive(false);
-        renderer.setDocumentFromString(document.html());
+        renderer.setDocumentFromString(writer.toString());
         renderer.layout();
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         renderer.createPDF(baos);
