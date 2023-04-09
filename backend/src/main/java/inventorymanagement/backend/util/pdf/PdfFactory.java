@@ -5,6 +5,7 @@ import com.github.mustachejava.Mustache;
 import com.github.mustachejava.MustacheFactory;
 import inventorymanagement.backend.dto.ItemDTO;
 import inventorymanagement.backend.util.enums.ImportExport;
+import inventorymanagement.backend.util.exception.PdfTemplateNotFoundException;
 import org.xhtmlrenderer.layout.SharedContext;
 import org.xhtmlrenderer.pdf.ITextRenderer;
 
@@ -17,7 +18,10 @@ import java.util.HashMap;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-public class PdfFactory {
+public final class PdfFactory {
+
+    private PdfFactory() {}
+
     public static byte[] produce(ItemDTO item, ImportExport type) {
 
         Mustache mustache;
@@ -41,7 +45,7 @@ public class PdfFactory {
                 mustache = mf.compile(new InputStreamReader(PdfFactory.class.getResourceAsStream(name), UTF_8), name);
             }
         } catch (NullPointerException e) {
-            throw new RuntimeException(e);
+            throw new PdfTemplateNotFoundException(e);
         }
 
         mustache.execute(writer, scopes);

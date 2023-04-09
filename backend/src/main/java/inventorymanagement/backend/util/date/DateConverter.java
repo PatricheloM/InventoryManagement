@@ -1,22 +1,24 @@
 package inventorymanagement.backend.util.date;
 
+import inventorymanagement.backend.util.exception.JsonDateMappingException;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class DateConverter {
 
-    private static final SimpleDateFormat sdt = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSX");
+    private final SimpleDateFormat sdt = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSX");
 
-    public static Date dateFromString(String s){
+    public Date dateFromString(String s){
         try {
             return sdt.parse(s);
         } catch (ParseException e) {
-            throw new RuntimeException(e);
+            throw new JsonDateMappingException(e);
         }
     }
 
-    public static String stringFromDate(Date d) {
+    public String stringFromDate(Date d) {
         return sdt.format(d);
     }
 }

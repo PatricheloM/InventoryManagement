@@ -21,6 +21,8 @@ public class ItemRepositoryImpl implements ItemRepository {
     @Autowired
     RedisRepository redisRepository;
 
+    private final DateConverter dateConverter = new DateConverter();
+
     @Override
     public boolean itemEquals(Object o1, Object o2) {
         if (o1 == o2) return true;
@@ -38,7 +40,7 @@ public class ItemRepositoryImpl implements ItemRepository {
                 "name", item.getName(),
                 "weight", String.valueOf(item.getWeight()),
                 "company", item.getCompany(),
-                "arrival", DateConverter.stringFromDate(item.getArrival()),
+                "arrival", dateConverter.stringFromDate(item.getArrival()),
                 "location", item.getLocation()
         ));
     }
@@ -79,7 +81,7 @@ public class ItemRepositoryImpl implements ItemRepository {
             item.setName(fetch.get("name"));
             item.setWeight(Integer.parseInt(fetch.get("weight")));
             item.setCompany(fetch.get("company"));
-            item.setArrival(DateConverter.dateFromString(fetch.get("arrival")));
+            item.setArrival(dateConverter.dateFromString(fetch.get("arrival")));
             item.setLocation(fetch.get("location"));
             return Optional.of(item);
         } else {

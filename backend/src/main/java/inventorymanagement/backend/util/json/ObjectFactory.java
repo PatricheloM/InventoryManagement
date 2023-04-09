@@ -6,7 +6,9 @@ import com.fasterxml.jackson.databind.ObjectReader;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class ObjectFactory<T> {
+public final class ObjectFactory {
+
+    private ObjectFactory() {}
 
     private static final ObjectMapper mapper = new ObjectMapper();
     private static final ObjectReader reader = mapper.reader();

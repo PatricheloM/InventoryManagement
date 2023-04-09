@@ -1,7 +1,5 @@
 package inventorymanagement.backend.model;
 
-import inventorymanagement.backend.util.enums.AccountPrivilege;
-
 public class Token {
     private String token;
     private String username;

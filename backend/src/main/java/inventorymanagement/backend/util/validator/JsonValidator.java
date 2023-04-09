@@ -6,7 +6,9 @@ import com.networknt.schema.JsonSchemaFactory;
 import com.networknt.schema.SpecVersion;
 import inventorymanagement.backend.util.exception.SchemaNotFoundException;
 
-public class JsonValidator {
+public final class JsonValidator {
+
+    private JsonValidator() {}
 
     public static final JsonSchemaFactory jsonSchemaFactory = JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V4);
 

@@ -3,7 +3,10 @@ package inventorymanagement.backend.util;
 import inventorymanagement.backend.util.constants.MessageConstants;
 import inventorymanagement.backend.util.constants.RedisConstants;
 
-public class InventoryManagementStringTools {
+public final class InventoryManagementStringTools {
+
+    private InventoryManagementStringTools() {}
+
     public static String getAccountSetKey() {
         return RedisConstants.ACCOUNT_NAMES_KEY;
     }
@@ -49,13 +52,7 @@ public class InventoryManagementStringTools {
     public static String getTokenDoesNotExistMsg() {
         return MessageConstants.TOKEN_DOES_NOT_EXIST_MSG;
     }
-    public static String getItemAddedMsg() {
-        return MessageConstants.ITEM_ADDED_MSG;
-    }
     public static String getItemNotFoundMsg() {
         return MessageConstants.ITEM_NOT_FOUND_MSG;
-    }
-    public static String getItemDeletedMsg() {
-        return MessageConstants.ITEM_DELETED_MSG;
     }
 }

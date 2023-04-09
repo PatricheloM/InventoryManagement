@@ -5,10 +5,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 
-public class JsonFactory {
+public final class JsonFactory {
 
-    private final static ObjectMapper mapper = new ObjectMapper();
-    private final static ObjectWriter writer = mapper.writer().withDefaultPrettyPrinter();
+    private JsonFactory() {}
+
+    private static final ObjectMapper mapper = new ObjectMapper();
+    private static final ObjectWriter writer = mapper.writer().withDefaultPrettyPrinter();
 
     public static JsonNode produce(Object object) throws JsonProcessingException {
         return mapper.readTree(writer.writeValueAsString(object));

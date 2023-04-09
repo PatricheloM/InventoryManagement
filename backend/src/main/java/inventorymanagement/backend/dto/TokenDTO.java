@@ -1,7 +1,5 @@
 package inventorymanagement.backend.dto;
 
-import inventorymanagement.backend.util.enums.AccountPrivilege;
-
 import java.util.Objects;
 
 public class TokenDTO {

@@ -4,6 +4,7 @@ import inventorymanagement.backend.model.RedisConfig;
 import inventorymanagement.backend.util.auth.AuthorizationCheck;
 import inventorymanagement.backend.util.auth.impl.AuthorizationCheckImpl;
 import inventorymanagement.backend.util.exception.ConfigNotFoundException;
+import inventorymanagement.backend.util.exception.JsonDateMappingException;
 import inventorymanagement.backend.util.json.ObjectFactory;
 import org.modelmapper.AbstractConverter;
 import org.modelmapper.AbstractProvider;
@@ -54,13 +55,13 @@ public class AppConfig {
             try {
                 return sdt.parse(source);
             } catch (ParseException e) {
-                throw new RuntimeException(e);
+                throw new JsonDateMappingException(e);
             }
         }
     };
 
     @Bean
-    public ModelMapper modelMapper() {
+    ModelMapper modelMapper() {
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.createTypeMap(String.class, Date.class);
         modelMapper.addConverter(toStringDate);
@@ -69,7 +70,7 @@ public class AppConfig {
     }
 
     @Bean
-    public AuthorizationCheck authorizationCheck() {
+    AuthorizationCheck authorizationCheck() {
         return new AuthorizationCheckImpl();
     }
 }
