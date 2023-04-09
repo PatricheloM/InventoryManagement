@@ -2,7 +2,7 @@ package inventorymanagement.backend.util.auth;
 
 import java.util.UUID;
 
-public class TokenFactory {
+public final class TokenFactory {
 
     private TokenFactory(){}
 

@@ -1,6 +1,6 @@
 package inventorymanagement.backend.util.date;
 
-import inventorymanagement.backend.util.exception.JsonDateMappingException;
+import inventorymanagement.backend.util.exception.DateMappingException;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -14,7 +14,7 @@ public class DateConverter {
         try {
             return sdt.parse(s);
         } catch (ParseException e) {
-            throw new JsonDateMappingException(e);
+            throw new DateMappingException(e);
         }
     }
 
