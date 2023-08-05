@@ -24,7 +24,7 @@ public class RedisRepository {
     public int del(String... key)
     {
         Jedis jedis = jedisPool.getResource();
-        int response = jedis.del(key).intValue();
+        int response = (int) jedis.del(key);
         jedis.close();
         return response;
     }
@@ -39,7 +39,7 @@ public class RedisRepository {
     public int sadd(String key, String... value)
     {
         Jedis jedis = jedisPool.getResource();
-        int response = jedis.sadd(key, value).intValue();
+        int response = (int) jedis.sadd(key, value);
         jedis.close();
         return response;
     }
@@ -47,7 +47,7 @@ public class RedisRepository {
     public int srem(String key, String... value)
     {
         Jedis jedis = jedisPool.getResource();
-        int response = jedis.srem(key, value).intValue();
+        int response = (int) jedis.srem(key, value);
         jedis.close();
         return response;
     }
@@ -113,7 +113,7 @@ public class RedisRepository {
 
     public int incrby(String key, int value) {
         Jedis jedis = jedisPool.getResource();
-        int response = jedis.incrBy(key, value).intValue();
+        int response = (int) jedis.incrBy(key, value);
         jedis.close();
         return response;
     }

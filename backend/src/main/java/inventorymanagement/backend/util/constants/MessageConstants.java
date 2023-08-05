@@ -16,4 +16,5 @@ public interface MessageConstants {
     String ITEM_ADDED_MSG = "Item imported";
     String ITEM_NOT_FOUND_MSG = "Item not found";
     String ITEM_DELETED_MSG = "Item exported";
+    String PONG = "Pong";
 }

@@ -8,7 +8,7 @@ public final class ResponseEntityFactory {
 
     private ResponseEntityFactory(){}
 
-    public static ResponseEntity<Object> produce(String msg, HttpStatus httpStatus, String path) {
+    public static ResponseEntity<?> produce(String msg, HttpStatus httpStatus, String path) {
         return new ResponseEntity<>(new MessageDTO(
                 msg, httpStatus, path), httpStatus);
     }

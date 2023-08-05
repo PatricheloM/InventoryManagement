@@ -28,7 +28,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
 import java.util.Optional;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -36,157 +35,242 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/api/account")
-public class AccountController {
+public class AccountController extends BaseController {
 
     private static final String PATH = "/api/account";
 
     @Autowired
-    protected ModelMapper modelMapper;
+    ModelMapper modelMapper;
     @Autowired
     AccountService accountService;
-
     @Autowired
     AuthorizationCheck authorizationCheck;
 
     @PostMapping(value = "/login", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-    ResponseEntity<Object> login(@RequestBody Object object) {
+    ResponseEntity<?> login(@RequestBody Object object) {
         try {
-            if (JsonValidator.validate(JsonFactory.produce(object), LoginDTO.class)) {
-                LoginDTO login = modelMapper.map(object, LoginDTO.class);
-                Optional<AccountDTO> account = accountService.fetchAccountByUsername(login.getUsername().toLowerCase());
-                if (account.isPresent() && account.get().getPassword().equals(login.getPassword())) {
-                    String token = TokenFactory.generate();
-                    TokenDTO t = new TokenDTO(token, account.get().getUsername());
-                    accountService.saveToken(t);
-                    return new ResponseEntity<>(t, HttpStatus.OK);
-                } else {
-                    return ResponseEntityFactory.produce(InventoryManagementStringTools.getForbiddenMsg(),
-                            HttpStatus.FORBIDDEN, PATH + "/login");
-                }
+            if (!JsonValidator.validate(JsonFactory.produce(object), LoginDTO.class)) {
+                return ResponseEntityFactory.produce(
+                        InventoryManagementStringTools.getBadRequestMsg(),
+                        HttpStatus.BAD_REQUEST, PATH + "/login"
+                );
             }
-            else
-                return ResponseEntityFactory.produce(InventoryManagementStringTools.getBadRequestMsg(),
-                        HttpStatus.BAD_REQUEST, PATH + "/login");
         }
         catch (SchemaNotFoundException | JsonProcessingException e) {
-            return ResponseEntityFactory.produce(InventoryManagementStringTools.getInternalServerErrorMsg(),
-                    HttpStatus.INTERNAL_SERVER_ERROR, PATH + "/login");
+            return ResponseEntityFactory.produce(
+                    InventoryManagementStringTools.getInternalServerErrorMsg(),
+                    HttpStatus.INTERNAL_SERVER_ERROR, PATH + "/login"
+            );
         }
+
+        LoginDTO login = modelMapper.map(object, LoginDTO.class);
+        Optional<AccountDTO> account = accountService.fetchAccountByUsername(login.getUsername().toLowerCase());
+
+        if (account.isPresent() && account.get().getPassword().equals(login.getPassword())) {
+
+            String token = TokenFactory.generate();
+            TokenDTO t = new TokenDTO(token, account.get().getUsername());
+
+            accountService.saveToken(t);
+
+            return new ResponseEntity<>(t, HttpStatus.OK);
+        }
+
+        return ResponseEntityFactory.produce(
+                InventoryManagementStringTools.getForbiddenMsg(),
+                HttpStatus.FORBIDDEN, PATH + "/login"
+        );
+
     }
 
-    @Authorization(privileges = { AccountPrivilege.ADMIN,
-            AccountPrivilege.EXPORTER, AccountPrivilege.IMPORTER,
-            AccountPrivilege.IMPORTER_EXPORTER, AccountPrivilege.MAINTENANCE})
+    @Authorization(
+            privileges = {
+                    AccountPrivilege.ADMIN,
+                    AccountPrivilege.EXPORTER,
+                    AccountPrivilege.IMPORTER,
+                    AccountPrivilege.IMPORTER_EXPORTER,
+                    AccountPrivilege.MAINTENANCE
+            }
+    )
     @GetMapping(value = "/logout", produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<Object> logout(@RequestParam String token) {
-        if (authorizationCheck.check(new Object(){}.getClass().getEnclosingMethod(), token)) {
-            accountService.deleteToken(token);
-            return ResponseEntityFactory.produce(InventoryManagementStringTools.getLoggedOutMsg(),
-                    HttpStatus.OK, PATH + "/logout");
-        } else {
-            return ResponseEntityFactory.produce(InventoryManagementStringTools.getUnauthorizedMsg(),
-                    HttpStatus.UNAUTHORIZED, PATH + "/logout");
+    public ResponseEntity<?> logout(@RequestParam String token) {
+        if (!authorizationCheck.check(this.getClass(), token)) {
+            return ResponseEntityFactory.produce(
+                    InventoryManagementStringTools.getUnauthorizedMsg(),
+                    HttpStatus.UNAUTHORIZED, PATH + "/logout"
+            );
         }
+
+        accountService.deleteToken(token);
+
+        return ResponseEntityFactory.produce(
+                InventoryManagementStringTools.getLoggedOutMsg(),
+                HttpStatus.OK, PATH + "/logout"
+        );
     }
 
-    @Authorization(privileges = { AccountPrivilege.ADMIN, AccountPrivilege.MAINTENANCE })
+    @Authorization(
+            privileges = {
+                    AccountPrivilege.ADMIN,
+                    AccountPrivilege.MAINTENANCE
+            }
+    )
     @PostMapping(value = "/register", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<Object> register(@RequestBody Object object, @RequestParam String token) {
-        if (authorizationCheck.check(new Object(){}.getClass().getEnclosingMethod(), token)) {
-            try {
-                if (JsonValidator.validate(JsonFactory.produce(object), AccountDTO.class)) {
-                    AccountDTO account = modelMapper.map(object, AccountDTO.class);
-                    account.setUsername(account.getUsername().toLowerCase());
-                    if (accountService.saveAccount(account)) {
-                        return ResponseEntityFactory.produce(InventoryManagementStringTools.getSuccessfulRegistrationMsg(),
-                                HttpStatus.OK, PATH + "/register");
-                    } else {
-                        return ResponseEntityFactory.produce(InventoryManagementStringTools.getUsernameAlreadyExistsMsg(),
-                                HttpStatus.CONFLICT, PATH + "/register");
-                    }
-                }
-                else
-                    return ResponseEntityFactory.produce(InventoryManagementStringTools.getBadRequestMsg(),
-                            HttpStatus.BAD_REQUEST, PATH + "/register");
-            } catch (SchemaNotFoundException | JsonProcessingException e) {
-                return ResponseEntityFactory.produce(InventoryManagementStringTools.getInternalServerErrorMsg(),
-                        HttpStatus.INTERNAL_SERVER_ERROR, PATH + "/register");
-            }
-        } else {
-            return ResponseEntityFactory.produce(InventoryManagementStringTools.getUnauthorizedMsg(),
-                    HttpStatus.UNAUTHORIZED, PATH + "/register");
+    public ResponseEntity<?> register(@RequestBody Object object, @RequestParam String token) {
+        if (!authorizationCheck.check(this.getClass(), token)) {
+            return ResponseEntityFactory.produce(
+                    InventoryManagementStringTools.getUnauthorizedMsg(),
+                    HttpStatus.UNAUTHORIZED, PATH + "/register"
+            );
         }
+
+        try {
+            if (!JsonValidator.validate(JsonFactory.produce(object), AccountDTO.class)) {
+                return ResponseEntityFactory.produce(
+                        InventoryManagementStringTools.getBadRequestMsg(),
+                        HttpStatus.BAD_REQUEST, PATH + "/register"
+                );
+            }
+        } catch (SchemaNotFoundException | JsonProcessingException e) {
+            return ResponseEntityFactory.produce(
+                    InventoryManagementStringTools.getInternalServerErrorMsg(),
+                    HttpStatus.INTERNAL_SERVER_ERROR, PATH + "/register"
+            );
+        }
+
+        AccountDTO account = modelMapper.map(object, AccountDTO.class);
+        account.setUsername(account.getUsername().toLowerCase());
+
+        if (accountService.saveAccount(account)) {
+            return ResponseEntityFactory.produce(
+                    InventoryManagementStringTools.getSuccessfulRegistrationMsg(),
+                    HttpStatus.OK, PATH + "/register"
+            );
+        }
+
+        return ResponseEntityFactory.produce(
+                    InventoryManagementStringTools.getUsernameAlreadyExistsMsg(),
+                    HttpStatus.CONFLICT, PATH + "/register"
+        );
     }
 
-    @Authorization(privileges = { AccountPrivilege.ADMIN })
+    @Authorization(
+            privileges = {
+                    AccountPrivilege.ADMIN
+            }
+    )
     @PatchMapping(value = "/{username}", produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<Object> changePassword(@PathVariable("username")String username, @RequestParam String newPassword, @RequestParam String token) {
-        if (authorizationCheck.check(new Object(){}.getClass().getEnclosingMethod(), token) ) {
-            if (accountService.changePassword(username.toLowerCase(), newPassword)) {
-                return ResponseEntityFactory.produce(InventoryManagementStringTools.getSuccessfulPasswordChangeMsg(),
-                        HttpStatus.OK, PATH + "/" + username);
-            } else {
-                return ResponseEntityFactory.produce(InventoryManagementStringTools.getUserDoesNotExistMsg(),
-                        HttpStatus.NOT_FOUND, PATH + "/" + username);
-            }
-        } else if (accountService.getToken(token).isPresent() && username.equals(accountService.getToken(token).get().getUsername())) {
+    public ResponseEntity<?> changePassword(@PathVariable("username")String username, @RequestParam String newPassword, @RequestParam String token) {
+
+        if (accountService.getToken(token).isPresent() && username.equals(accountService.getToken(token).get().getUsername())) {
+
             accountService.changePassword(username, newPassword);
-            return ResponseEntityFactory.produce(InventoryManagementStringTools.getSuccessfulPasswordChangeMsg(),
-                    HttpStatus.OK, PATH + "/" + username);
-        } else {
-            return ResponseEntityFactory.produce(InventoryManagementStringTools.getUnauthorizedMsg(),
-                    HttpStatus.UNAUTHORIZED, PATH + "/" + username);
+
+            return ResponseEntityFactory.produce(
+                    InventoryManagementStringTools.getSuccessfulPasswordChangeMsg(),
+                    HttpStatus.OK, PATH + "/" + username
+            );
         }
+
+        if (!authorizationCheck.check(this.getClass(), token) ) {
+            return ResponseEntityFactory.produce(
+                    InventoryManagementStringTools.getUnauthorizedMsg(),
+                    HttpStatus.UNAUTHORIZED, PATH + "/" + username
+            );
+        }
+
+        if (accountService.changePassword(username.toLowerCase(), newPassword)) {
+            return ResponseEntityFactory.produce(
+                    InventoryManagementStringTools.getSuccessfulPasswordChangeMsg(),
+                    HttpStatus.OK, PATH + "/" + username
+            );
+        }
+
+        return ResponseEntityFactory.produce(
+                InventoryManagementStringTools.getUserDoesNotExistMsg(),
+                HttpStatus.NOT_FOUND, PATH + "/" + username
+        );
     }
 
-    @Authorization(privileges = { AccountPrivilege.ADMIN })
-    @DeleteMapping(value = "/{username}", produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<Object> deleteUser(@PathVariable("username") String username, @RequestParam String token) {
-        if (authorizationCheck.check(new Object(){}.getClass().getEnclosingMethod(), token) ) {
-            if (accountService.deleteAccount(username.toLowerCase())) {
-                for (TokenDTO t : accountService.getTokens()) {
-                    if (username.equals(t.getUsername())) {
-                        accountService.deleteToken(t.getToken());
-                    }
-                }
-                return ResponseEntityFactory.produce(InventoryManagementStringTools.getUserDeletedMsg(),
-                        HttpStatus.OK, PATH + "/" + username);
-            } else {
-                return ResponseEntityFactory.produce(InventoryManagementStringTools.getUserDoesNotExistMsg(),
-                        HttpStatus.NOT_FOUND, PATH + "/" + username);
+    @Authorization(
+            privileges = {
+                    AccountPrivilege.ADMIN
             }
-        } else {
-            return ResponseEntityFactory.produce(InventoryManagementStringTools.getUnauthorizedMsg(),
-                    HttpStatus.UNAUTHORIZED, PATH + "/" + username);
+    )
+    @DeleteMapping(value = "/{username}", produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> deleteUser(@PathVariable("username") String username, @RequestParam String token) {
+        if (!authorizationCheck.check(this.getClass(), token)) {
+            return ResponseEntityFactory.produce(
+                    InventoryManagementStringTools.getUnauthorizedMsg(),
+                    HttpStatus.UNAUTHORIZED, PATH + "/" + username
+            );
         }
+
+        if (!accountService.deleteAccount(username.toLowerCase())) {
+            return ResponseEntityFactory.produce(
+                    InventoryManagementStringTools.getUserDoesNotExistMsg(),
+                    HttpStatus.NOT_FOUND, PATH + "/" + username
+            );
+        }
+
+        accountService.getTokens()
+                .stream()
+                .filter(t -> username.equals(t.getUsername()))
+                .forEach(t -> accountService.deleteAccount(t.getToken()));
+
+        return ResponseEntityFactory.produce(
+                InventoryManagementStringTools.getUserDeletedMsg(),
+                HttpStatus.OK, PATH + "/" + username
+        );
     }
 
     @GetMapping(value = "/token/{token}", produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<Object> checkToken(@PathVariable("token") String token) {
+    public ResponseEntity<?> checkToken(@PathVariable("token") String token) {
+
         Optional<TokenDTO> t = accountService.getToken(token);
-        if (t.isPresent()) {
-            Optional<AccountDTO> account = accountService.fetchAccountByUsername(t.get().getUsername());
-            return account.<ResponseEntity<Object>>map(accountDTO -> new ResponseEntity<>(accountDTO, HttpStatus.OK))
-                    .orElseGet(() -> ResponseEntityFactory.produce(InventoryManagementStringTools.getUserDoesNotExistMsg(),
-                    HttpStatus.NOT_FOUND, PATH + "/token/" + token));
-        } else {
-            return ResponseEntityFactory.produce(InventoryManagementStringTools.getTokenDoesNotExistMsg(),
+
+        if (t.isEmpty()) {
+            return ResponseEntityFactory.produce(
+                    InventoryManagementStringTools.getTokenDoesNotExistMsg(),
                     HttpStatus.NOT_FOUND, PATH + "/token/" + token);
         }
+
+        Optional<AccountDTO> account = accountService.fetchAccountByUsername(t.get().getUsername());
+
+        return account.<ResponseEntity<?>>map(accountDTO ->
+                        new ResponseEntity<>(accountDTO, HttpStatus.OK))
+                .orElseGet(() ->
+                        ResponseEntityFactory.produce(
+                                InventoryManagementStringTools.getUserDoesNotExistMsg(),
+                                HttpStatus.NOT_FOUND, PATH + "/token/" + token
+                        )
+                );
     }
 
-    @Authorization(privileges = { AccountPrivilege.ADMIN, AccountPrivilege.MAINTENANCE })
+    @Authorization(privileges = {
+            AccountPrivilege.ADMIN,
+            AccountPrivilege.MAINTENANCE
+            }
+    )
     @GetMapping(value = "/{username}", produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<Object> getUser(@PathVariable("username") String username, @RequestParam String token) {
-        if (authorizationCheck.check(new Object(){}.getClass().getEnclosingMethod(), token) ) {
-            Optional<AccountDTO> account = accountService.fetchAccountByUsername(username.toLowerCase());
-            return account.<ResponseEntity<Object>>map(accountDTO -> new ResponseEntity<>(accountDTO, HttpStatus.OK))
-                    .orElseGet(() -> ResponseEntityFactory.produce(InventoryManagementStringTools.getUserDoesNotExistMsg(),
-                            HttpStatus.NOT_FOUND, PATH + "/" + username));
-
-        } else {
-            return ResponseEntityFactory.produce(InventoryManagementStringTools.getUnauthorizedMsg(),
-                    HttpStatus.UNAUTHORIZED, PATH + "/" + username);
+    public ResponseEntity<?> getUser(@PathVariable("username") String username, @RequestParam String token) {
+        if (!authorizationCheck.check(this.getClass(), token)) {
+            return ResponseEntityFactory.produce(
+                    InventoryManagementStringTools.getUnauthorizedMsg(),
+                    HttpStatus.UNAUTHORIZED, PATH + "/" + username
+            );
         }
+
+        Optional<AccountDTO> account = accountService.fetchAccountByUsername(username.toLowerCase());
+
+        return account.<ResponseEntity<?>>map(
+                accountDTO ->
+                        new ResponseEntity<>(accountDTO, HttpStatus.OK))
+                .orElseGet(() ->
+                        ResponseEntityFactory.produce(
+                                InventoryManagementStringTools.getUserDoesNotExistMsg(),
+                                HttpStatus.NOT_FOUND, PATH + "/" + username)
+                );
+
     }
 }
