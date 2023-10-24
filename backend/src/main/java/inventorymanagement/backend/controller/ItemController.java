@@ -39,8 +39,6 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RequestMapping("/api/item")
 public class ItemController extends BaseController {
 
-    private static final String PATH = "/api/item";
-
     @Autowired
     ModelMapper modelMapper;
     @Autowired

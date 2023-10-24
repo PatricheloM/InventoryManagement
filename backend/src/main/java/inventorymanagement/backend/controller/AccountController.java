@@ -37,8 +37,6 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RequestMapping("/api/account")
 public class AccountController extends BaseController {
 
-    private static final String PATH = "/api/account";
-
     @Autowired
     ModelMapper modelMapper;
     @Autowired

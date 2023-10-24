@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/base")
 public class BaseController {
 
-    private static final String PATH = BaseController.class.getAnnotation(RequestMapping.class).value()[0];
+    protected final String PATH = this.getClass().getAnnotation(RequestMapping.class).value()[0];
 
     @GetMapping(value = "/ping")
     public ResponseEntity<?> ping() {
