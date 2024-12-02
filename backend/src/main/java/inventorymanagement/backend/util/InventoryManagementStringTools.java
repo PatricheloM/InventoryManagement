@@ -55,6 +55,9 @@ public final class InventoryManagementStringTools {
     public static String getItemNotFoundMsg() {
         return MessageConstants.ITEM_NOT_FOUND_MSG;
     }
+    public static String getPageNotFoundMsg() {
+        return MessageConstants.PAGE_NOT_FOUND_MSG;
+    }
     public static String getPongMsg() {
         return MessageConstants.PONG;
     }

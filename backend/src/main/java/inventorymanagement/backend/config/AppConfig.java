@@ -2,6 +2,7 @@ package inventorymanagement.backend.config;
 
 import inventorymanagement.backend.model.RedisConfig;
 import inventorymanagement.backend.util.auth.AuthorizationCheck;
+import inventorymanagement.backend.util.auth.AuthorizationInterceptor;
 import inventorymanagement.backend.util.auth.impl.AuthorizationCheckImpl;
 import inventorymanagement.backend.util.exception.ConfigNotFoundException;
 import inventorymanagement.backend.util.exception.DateMappingException;
@@ -24,7 +25,6 @@ import java.util.Date;
 @Configuration
 @EnableCaching
 public class AppConfig {
-
     @Bean
     JedisPool jedisPool() {
         RedisConfig redisConfig;

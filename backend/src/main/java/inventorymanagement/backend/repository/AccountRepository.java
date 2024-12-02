@@ -15,7 +15,7 @@ public interface AccountRepository {
     boolean deleteAccount(String username);
     boolean accountExists(String username);
     void saveToken(Token token);
-    boolean deleteToken(String token);
+    void deleteToken(String token);
     Optional<Token> getToken(String token);
     List<Token> getTokens();
 }

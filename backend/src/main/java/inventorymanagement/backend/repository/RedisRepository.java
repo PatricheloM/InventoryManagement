@@ -14,13 +14,6 @@ public class RedisRepository {
     @Autowired
     JedisPool jedisPool;
 
-    public void set(String key, String value)
-    {
-        Jedis jedis = jedisPool.getResource();
-        jedis.set(key, value);
-        jedis.close();
-    }
-
     public int del(String... key)
     {
         Jedis jedis = jedisPool.getResource();
@@ -33,6 +26,29 @@ public class RedisRepository {
     {
         Jedis jedis = jedisPool.getResource();
         jedis.hmset(key, values);
+        jedis.close();
+    }
+
+    public String hget(String key, String field)
+    {
+        Jedis jedis = jedisPool.getResource();
+        String response = jedis.hget(key, field);
+        jedis.close();
+        return response;
+    }
+
+    public boolean hexists(String key, String field)
+    {
+        Jedis jedis = jedisPool.getResource();
+        boolean response = jedis.hexists(key, field);
+        jedis.close();
+        return response;
+    }
+
+    public void hdel(String key, String... fields)
+    {
+        Jedis jedis = jedisPool.getResource();
+        jedis.hdel(key, fields);
         jedis.close();
     }
 
@@ -90,25 +106,10 @@ public class RedisRepository {
         jedis.close();
     }
 
-    public boolean exists(String key) {
+    public void hexpire(String key, int expiration, String... fields) {
         Jedis jedis = jedisPool.getResource();
-        boolean response = jedis.exists(key);
+        jedis.hexpire(key, expiration,  fields);
         jedis.close();
-        return response;
-    }
-
-    public String get(String key) {
-        Jedis jedis = jedisPool.getResource();
-        String response = jedis.get(key);
-        jedis.close();
-        return response;
-    }
-
-    public List<String> keys(String regex) {
-        Jedis jedis = jedisPool.getResource();
-        List<String> response = new ArrayList<>(jedis.keys(regex));
-        jedis.close();
-        return response;
     }
 
     public int incrby(String key, int value) {

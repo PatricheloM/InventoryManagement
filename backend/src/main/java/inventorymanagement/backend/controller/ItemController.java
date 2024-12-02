@@ -8,7 +8,6 @@ import inventorymanagement.backend.service.ItemService;
 import inventorymanagement.backend.util.InventoryManagementStringTools;
 import inventorymanagement.backend.util.ResponseEntityFactory;
 import inventorymanagement.backend.util.auth.Authorization;
-import inventorymanagement.backend.util.auth.AuthorizationCheck;
 import inventorymanagement.backend.util.enums.AccountPrivilege;
 import inventorymanagement.backend.util.enums.ImportExport;
 import inventorymanagement.backend.util.exception.SchemaNotFoundException;
@@ -20,13 +19,11 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -34,7 +31,6 @@ import java.util.Optional;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
-@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/api/item")
 public class ItemController extends BaseController {
@@ -43,8 +39,6 @@ public class ItemController extends BaseController {
     ModelMapper modelMapper;
     @Autowired
     ItemService itemService;
-    @Autowired
-    AuthorizationCheck authorizationCheck;
 
     @Authorization(
             privileges = {
@@ -54,16 +48,9 @@ public class ItemController extends BaseController {
             }
     )
     @PostMapping(value = "/importing", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> importing(@RequestBody Object object, @RequestParam String token) {
-        if (!authorizationCheck.check(this.getClass(), token)) {
-            return ResponseEntityFactory.produce(
-                    InventoryManagementStringTools.getUnauthorizedMsg(),
-                    HttpStatus.UNAUTHORIZED, PATH + "/importing"
-            );
-        }
-
+    public ResponseEntity<?> importing(@RequestBody Object object) {
         try {
-            if (!JsonValidator.validate(JsonFactory.produce(object), ItemDTO.class)) {
+            if (!JsonValidator.getInstance().validate(JsonFactory.produce(object), ItemDTO.class)) {
                 return ResponseEntityFactory.produce(
                         InventoryManagementStringTools.getBadRequestMsg(),
                         HttpStatus.BAD_REQUEST, PATH + "/importing"
@@ -91,16 +78,9 @@ public class ItemController extends BaseController {
             }
     )
     @PostMapping(value = "/exporting", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> exporting(@RequestBody Object object, @RequestParam String token) {
-        if (!authorizationCheck.check(this.getClass(), token)) {
-            return ResponseEntityFactory.produce(
-                    InventoryManagementStringTools.getUnauthorizedMsg(),
-                    HttpStatus.UNAUTHORIZED, PATH + "/exporting"
-            );
-        }
-
+    public ResponseEntity<?> exporting(@RequestBody Object object) {
         try {
-            if (!JsonValidator.validate(JsonFactory.produce(object), ItemDTO.class)) {
+            if (!JsonValidator.getInstance().validate(JsonFactory.produce(object), ItemDTO.class)) {
                 return ResponseEntityFactory.produce(
                         InventoryManagementStringTools.getBadRequestMsg(),
                         HttpStatus.BAD_REQUEST, PATH + "/exporting"
@@ -137,14 +117,7 @@ public class ItemController extends BaseController {
             }
     )
     @GetMapping(value = "/item/{itemId}", produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getItem(@PathVariable("itemId") int itemId, @RequestParam String token) {
-        if (!authorizationCheck.check(this.getClass(), token)) {
-            return ResponseEntityFactory.produce(
-                    InventoryManagementStringTools.getUnauthorizedMsg(),
-                    HttpStatus.UNAUTHORIZED, PATH + "/item/" + itemId
-            );
-        }
-
+    public ResponseEntity<?> getItem(@PathVariable("itemId") int itemId) {
         Optional<ItemDTO> item = itemService.fetchItem(itemId);
         return item.<ResponseEntity<?>>map(
                 itemDTO ->
@@ -167,14 +140,7 @@ public class ItemController extends BaseController {
             }
     )
     @GetMapping(value = "/item", produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getAllItems(@RequestParam String token) {
-        if (!authorizationCheck.check(this.getClass(), token)) {
-            return ResponseEntityFactory.produce(
-                    InventoryManagementStringTools.getUnauthorizedMsg(),
-                    HttpStatus.UNAUTHORIZED, PATH + "/item"
-            );
-        }
-
+    public ResponseEntity<?> getAllItems() {
         List<ItemDTO> items = itemService.fetchAllItems();
         return new ResponseEntity<>(items, HttpStatus.OK);
     }
@@ -189,14 +155,7 @@ public class ItemController extends BaseController {
             }
     )
     @GetMapping(value = "/name/{name}", produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getItemByName(@PathVariable("name") String name, @RequestParam String token) {
-        if (!authorizationCheck.check(this.getClass(), token)) {
-            return ResponseEntityFactory.produce(
-                    InventoryManagementStringTools.getUnauthorizedMsg(),
-                    HttpStatus.UNAUTHORIZED, PATH + "/name/" + name
-            );
-        }
-
+    public ResponseEntity<?> getItemByName(@PathVariable("name") String name) {
         List<ItemDTO> items = itemService.fetchItemByName(name);
         return new ResponseEntity<>(items, HttpStatus.OK);
     }
@@ -211,14 +170,7 @@ public class ItemController extends BaseController {
             }
     )
     @GetMapping(value = "/company/{company}", produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getItemByCompany(@PathVariable("company") String company, @RequestParam String token) {
-        if (!authorizationCheck.check(this.getClass(), token)) {
-            return ResponseEntityFactory.produce(
-                    InventoryManagementStringTools.getUnauthorizedMsg(),
-                    HttpStatus.UNAUTHORIZED, PATH + "/company/" + company
-            );
-        }
-
+    public ResponseEntity<?> getItemByCompany(@PathVariable("company") String company) {
         List<ItemDTO> items = itemService.fetchItemByCompany(company);
         return new ResponseEntity<>(items, HttpStatus.OK);
     }
@@ -232,14 +184,7 @@ public class ItemController extends BaseController {
                     AccountPrivilege.MAINTENANCE}
     )
     @GetMapping(value = "/location/{location}", produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getItemByLocation(@PathVariable("location") String location, @RequestParam String token) {
-        if (!authorizationCheck.check(this.getClass(), token)) {
-            return ResponseEntityFactory.produce(
-                    InventoryManagementStringTools.getUnauthorizedMsg(),
-                    HttpStatus.UNAUTHORIZED, PATH + "/company/" + location
-            );
-        }
-
+    public ResponseEntity<?> getItemByLocation(@PathVariable("location") String location) {
         List<ItemDTO> items = itemService.fetchItemByLocation(location);
         return new ResponseEntity<>(items, HttpStatus.OK);
     }
@@ -254,16 +199,9 @@ public class ItemController extends BaseController {
             }
     )
     @PostMapping(value = "/date", produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getItemByDate(@RequestBody Object object, @RequestParam String token) {
-        if (!authorizationCheck.check(this.getClass(), token)) {
-            return ResponseEntityFactory.produce(
-                    InventoryManagementStringTools.getUnauthorizedMsg(),
-                    HttpStatus.UNAUTHORIZED, PATH + "/date"
-            );
-        }
-
+    public ResponseEntity<?> getItemByDate(@RequestBody Object object) {
         try {
-            if (!JsonValidator.validate(JsonFactory.produce(object), DateQueryDTO.class)) {
+            if (!JsonValidator.getInstance().validate(JsonFactory.produce(object), DateQueryDTO.class)) {
                 return ResponseEntityFactory.produce(
                         InventoryManagementStringTools.getBadRequestMsg(),
                         HttpStatus.BAD_REQUEST, PATH + "/date"

@@ -9,11 +9,7 @@ import inventorymanagement.backend.util.enums.AccountPrivilege;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Repository
@@ -95,25 +91,21 @@ public class AccountRepositoryImpl implements AccountRepository {
 
     @Override
     public void saveToken(Token token) {
-        redisRepository.setex(token.getToken(), token.getUsername(), 86400);
+        redisRepository.hmset("TOKENS", new HashMap<>() {{ put(token.getToken(), token.getUsername()); }});
+        redisRepository.hexpire("TOKENS", 86400, token.getToken());
     }
 
     @Override
-    public boolean deleteToken(String token) {
-        if (redisRepository.exists(token)) {
-            redisRepository.del(token);
-            return true;
-        } else {
-            return false;
-        }
+    public void deleteToken(String token) {
+        redisRepository.hdel("TOKENS", token);
     }
 
     @Override
     public Optional<Token> getToken(String token) {
-        if (redisRepository.exists(token)) {
+        if (redisRepository.hexists("TOKENS", token)) {
             Token t = new Token();
             t.setToken(token);
-            t.setUsername(redisRepository.get(token));
+            t.setUsername(redisRepository.hget("TOKENS", token));
             return Optional.of(t);
         } else {
             return Optional.empty();
@@ -123,11 +115,10 @@ public class AccountRepositoryImpl implements AccountRepository {
     @Override
     public List<Token> getTokens() {
         List<Token> tokens = new ArrayList<>();
-        List<String> list = redisRepository.keys("*-*-*-*-*");
-        for (String key : list) {
+        for (var entry : redisRepository.hgetall("TOKENS").entrySet()) {
             Token t = new Token();
-            t.setToken(key);
-            t.setUsername(redisRepository.get(key));
+            t.setToken(entry.getKey());
+            t.setUsername(entry.getValue());
             tokens.add(t);
         }
         return tokens.isEmpty() ? Collections.emptyList() : tokens;

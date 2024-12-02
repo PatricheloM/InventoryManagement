@@ -1,6 +1,5 @@
 package inventorymanagement.backend.util.auth.impl;
 
-import inventorymanagement.backend.controller.BaseController;
 import inventorymanagement.backend.dto.TokenDTO;
 import inventorymanagement.backend.service.AccountService;
 import inventorymanagement.backend.util.auth.Authorization;
@@ -17,20 +16,14 @@ public class AuthorizationCheckImpl implements AuthorizationCheck {
     AccountService accountService;
 
     @Override
-    public boolean check(Class<? extends BaseController> clazz, String token) {
+    public boolean check(Method method, String token) {
 
-        Optional<TokenDTO> t = accountService.getToken(token);
+        if (!token.startsWith("Bearer ")) return false;
 
-        String methodName = Thread.currentThread().getStackTrace()[2].getMethodName();
-
-        return t.isPresent() && accountService.accountExists(t.get().getUsername())
-                && Arrays.asList(Arrays.stream(clazz.getMethods())
-                        .filter(name -> name.getName().equals(methodName))
-                        .findFirst().get()
-                        .getAnnotation(Authorization.class).privileges()
-                )
-                .contains(accountService.
-                        fetchAccountByUsername(t.get().getUsername()).get().getPrivilege()
-                );
+        Optional<TokenDTO> t = accountService.getToken(token.replace("Bearer ", ""));
+        return t.isPresent()
+                && accountService.accountExists(t.get().getUsername())
+                && Arrays.stream(method.getAnnotation(Authorization.class).privileges()).toList()
+                .contains(accountService.fetchAccountByUsername(t.get().getUsername()).get().getPrivilege());
     }
 }

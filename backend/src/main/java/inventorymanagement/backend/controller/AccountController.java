@@ -3,12 +3,13 @@ package inventorymanagement.backend.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import inventorymanagement.backend.dto.AccountDTO;
 import inventorymanagement.backend.dto.LoginDTO;
+import inventorymanagement.backend.dto.OAuthResponseDTO;
 import inventorymanagement.backend.dto.TokenDTO;
 import inventorymanagement.backend.service.AccountService;
 import inventorymanagement.backend.util.InventoryManagementStringTools;
 import inventorymanagement.backend.util.ResponseEntityFactory;
 import inventorymanagement.backend.util.auth.Authorization;
-import inventorymanagement.backend.util.auth.AuthorizationCheck;
+import inventorymanagement.backend.util.auth.NoAuthorizationRequired;
 import inventorymanagement.backend.util.auth.TokenFactory;
 import inventorymanagement.backend.util.enums.AccountPrivilege;
 import inventorymanagement.backend.util.exception.SchemaNotFoundException;
@@ -18,7 +19,6 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -32,7 +32,6 @@ import java.util.Optional;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
-@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/api/account")
 public class AccountController extends BaseController {
@@ -41,13 +40,12 @@ public class AccountController extends BaseController {
     ModelMapper modelMapper;
     @Autowired
     AccountService accountService;
-    @Autowired
-    AuthorizationCheck authorizationCheck;
 
+    @NoAuthorizationRequired
     @PostMapping(value = "/login", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     ResponseEntity<?> login(@RequestBody Object object) {
         try {
-            if (!JsonValidator.validate(JsonFactory.produce(object), LoginDTO.class)) {
+            if (!JsonValidator.getInstance().validate(JsonFactory.produce(object), LoginDTO.class)) {
                 return ResponseEntityFactory.produce(
                         InventoryManagementStringTools.getBadRequestMsg(),
                         HttpStatus.BAD_REQUEST, PATH + "/login"
@@ -71,7 +69,7 @@ public class AccountController extends BaseController {
 
             accountService.saveToken(t);
 
-            return new ResponseEntity<>(t, HttpStatus.OK);
+            return new ResponseEntity<>(new OAuthResponseDTO(token), HttpStatus.OK);
         }
 
         return ResponseEntityFactory.produce(
@@ -92,13 +90,6 @@ public class AccountController extends BaseController {
     )
     @GetMapping(value = "/logout", produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<?> logout(@RequestParam String token) {
-        if (!authorizationCheck.check(this.getClass(), token)) {
-            return ResponseEntityFactory.produce(
-                    InventoryManagementStringTools.getUnauthorizedMsg(),
-                    HttpStatus.UNAUTHORIZED, PATH + "/logout"
-            );
-        }
-
         accountService.deleteToken(token);
 
         return ResponseEntityFactory.produce(
@@ -114,16 +105,9 @@ public class AccountController extends BaseController {
             }
     )
     @PostMapping(value = "/register", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> register(@RequestBody Object object, @RequestParam String token) {
-        if (!authorizationCheck.check(this.getClass(), token)) {
-            return ResponseEntityFactory.produce(
-                    InventoryManagementStringTools.getUnauthorizedMsg(),
-                    HttpStatus.UNAUTHORIZED, PATH + "/register"
-            );
-        }
-
+    public ResponseEntity<?> register(@RequestBody Object object) {
         try {
-            if (!JsonValidator.validate(JsonFactory.produce(object), AccountDTO.class)) {
+            if (!JsonValidator.getInstance().validate(JsonFactory.produce(object), AccountDTO.class)) {
                 return ResponseEntityFactory.produce(
                         InventoryManagementStringTools.getBadRequestMsg(),
                         HttpStatus.BAD_REQUEST, PATH + "/register"
@@ -170,13 +154,6 @@ public class AccountController extends BaseController {
             );
         }
 
-        if (!authorizationCheck.check(this.getClass(), token) ) {
-            return ResponseEntityFactory.produce(
-                    InventoryManagementStringTools.getUnauthorizedMsg(),
-                    HttpStatus.UNAUTHORIZED, PATH + "/" + username
-            );
-        }
-
         if (accountService.changePassword(username.toLowerCase(), newPassword)) {
             return ResponseEntityFactory.produce(
                     InventoryManagementStringTools.getSuccessfulPasswordChangeMsg(),
@@ -196,14 +173,7 @@ public class AccountController extends BaseController {
             }
     )
     @DeleteMapping(value = "/{username}", produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> deleteUser(@PathVariable("username") String username, @RequestParam String token) {
-        if (!authorizationCheck.check(this.getClass(), token)) {
-            return ResponseEntityFactory.produce(
-                    InventoryManagementStringTools.getUnauthorizedMsg(),
-                    HttpStatus.UNAUTHORIZED, PATH + "/" + username
-            );
-        }
-
+    public ResponseEntity<?> deleteUser(@PathVariable("username") String username) {
         if (!accountService.deleteAccount(username.toLowerCase())) {
             return ResponseEntityFactory.produce(
                     InventoryManagementStringTools.getUserDoesNotExistMsg(),
@@ -222,6 +192,7 @@ public class AccountController extends BaseController {
         );
     }
 
+    @NoAuthorizationRequired
     @GetMapping(value = "/token/{token}", produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<?> checkToken(@PathVariable("token") String token) {
 
@@ -251,14 +222,7 @@ public class AccountController extends BaseController {
             }
     )
     @GetMapping(value = "/{username}", produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getUser(@PathVariable("username") String username, @RequestParam String token) {
-        if (!authorizationCheck.check(this.getClass(), token)) {
-            return ResponseEntityFactory.produce(
-                    InventoryManagementStringTools.getUnauthorizedMsg(),
-                    HttpStatus.UNAUTHORIZED, PATH + "/" + username
-            );
-        }
-
+    public ResponseEntity<?> getUser(@PathVariable("username") String username) {
         Optional<AccountDTO> account = accountService.fetchAccountByUsername(username.toLowerCase());
 
         return account.<ResponseEntity<?>>map(

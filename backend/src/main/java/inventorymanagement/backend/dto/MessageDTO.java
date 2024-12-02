@@ -9,7 +9,6 @@ public class MessageDTO  implements Serializable {
 
     private final ZonedDateTime timestamp;
     private final int status;
-    private final String error;
     private final String message;
     private final String path;
 
@@ -17,7 +16,6 @@ public class MessageDTO  implements Serializable {
     {
         timestamp = ZonedDateTime.now();
         status = httpStatus.value();
-        error = httpStatus.getReasonPhrase();
         this.message = message;
         this.path = path;
     }
@@ -28,10 +26,6 @@ public class MessageDTO  implements Serializable {
 
     public int getStatus() {
         return status;
-    }
-
-    public String getError() {
-        return error;
     }
 
     public String getMessage() {

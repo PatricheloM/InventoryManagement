@@ -72,8 +72,8 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public boolean deleteToken(String token) {
-        return accountRepository.deleteToken(token);
+    public void deleteToken(String token) {
+        accountRepository.deleteToken(token);
     }
 
     @Override
